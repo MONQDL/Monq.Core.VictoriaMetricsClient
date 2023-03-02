@@ -74,7 +74,7 @@ public static class DependencyInjectionExtensions
             throw new StorageConfigurationException(
                 """The "clusterAccountId" property must be positive number or has "multitenant" value.""");
         else
-            accountId = $"{options.ClusterAccountId ?? "1"}:{options.ClusterProjectId ?? 0}";
+            accountId = $"{options.ClusterAccountId ?? "1"}";
 
         switch (clusterNodeType)
         {
