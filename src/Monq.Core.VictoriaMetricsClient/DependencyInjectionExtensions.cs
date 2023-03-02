@@ -48,6 +48,12 @@ public static class DependencyInjectionExtensions
 
             if (victoriaOptions.UseHttpV2)
                 client.DefaultRequestVersion = new Version(2, 0);
+
+            if (clusterNodeType == ClusterNodeTypes.Write)
+            {
+                client.DefaultRequestHeaders.Add("X-Prometheus-Remote-Write-Version", "0.1.0");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-protobuf"));
+            }
         };
         return configurationFunc;
     }
@@ -79,8 +85,6 @@ public static class DependencyInjectionExtensions
             case ClusterNodeTypes.Write:
                 client.BaseAddress = new Uri(new Uri(options.ClusterSelectUri), 
                     $"insert/{accountId}/prometheus/api/v1/");
-                client.DefaultRequestHeaders.Add("X-Prometheus-Remote-Write-Version", "0.1.0");
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-protobuf"));
                 break;
         }
     }
