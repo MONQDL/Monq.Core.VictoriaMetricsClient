@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33414.496
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monq.Core.VictoriaMetricsClient", "src\Monq.Core.VictoriaMetricsClient\Monq.Core.VictoriaMetricsClient.csproj", "{31FFB43D-B826-4B5D-B430-420A92F777DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A63C8CDE-B07F-401B-AEB3-CD58126402F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monq.Core.VictoriaMetricsClient.Tests", "src\Monq.Core.VictoriaMetricsClient.Tests\Monq.Core.VictoriaMetricsClient.Tests.csproj", "{7AB34823-E25C-402C-98CA-E15620338E87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8B7878C4-4C86-4022-ABDC-147E1CC522F6}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		.github\workflows\netcorelibrary.yml = .github\workflows\netcorelibrary.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{31FFB43D-B826-4B5D-B430-420A92F777DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31FFB43D-B826-4B5D-B430-420A92F777DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31FFB43D-B826-4B5D-B430-420A92F777DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31FFB43D-B826-4B5D-B430-420A92F777DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AB34823-E25C-402C-98CA-E15620338E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AB34823-E25C-402C-98CA-E15620338E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AB34823-E25C-402C-98CA-E15620338E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AB34823-E25C-402C-98CA-E15620338E87}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{31FFB43D-B826-4B5D-B430-420A92F777DA} = {A63C8CDE-B07F-401B-AEB3-CD58126402F2}
+		{7AB34823-E25C-402C-98CA-E15620338E87} = {A63C8CDE-B07F-401B-AEB3-CD58126402F2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C2439078-C364-4D83-8DE1-234AD1EEACF2}
+	EndGlobalSection
+EndGlobal
