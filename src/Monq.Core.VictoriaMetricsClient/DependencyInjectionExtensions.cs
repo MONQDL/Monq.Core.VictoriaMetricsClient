@@ -70,11 +70,8 @@ public static class DependencyInjectionExtensions
 
         if (options.ClusterAccountId == multitenant)
             accountId = multitenant;
-        else if (!int.TryParse(options.ClusterAccountId, out var _))
-            throw new StorageConfigurationException(
-                """The "clusterAccountId" property must be positive number or has "multitenant" value.""");
         else
-            accountId = $"{options.ClusterAccountId ?? "1"}";
+            accountId = $"{options.ClusterAccountId ?? "0"}";
 
         switch (clusterNodeType)
         {
@@ -83,7 +80,7 @@ public static class DependencyInjectionExtensions
                     $"select/{accountId}/prometheus/api/v1/");
                 break;
             case ClusterNodeTypes.Write:
-                client.BaseAddress = new Uri(new Uri(options.ClusterSelectUri), 
+                client.BaseAddress = new Uri(new Uri(options.ClusterInsertUri), 
                     $"insert/{accountId}/prometheus/api/v1/");
                 break;
         }

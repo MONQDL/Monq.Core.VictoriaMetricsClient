@@ -17,11 +17,13 @@ public class VictoriaOptions
     public bool IsCluster { get; set; } = false;
 
     /// <summary>
-    /// 
+    /// Is an arbitrary 32-bit integer identifying namespace for data ingestion (aka tenant). 
+    /// It is possible to set it as accountID:projectID, where projectID is also arbitrary 32-bit integer. 
+    /// If projectID isn't set, then it equals to 0. 
+    /// See multitenancy docs for more details. 
+    /// The "accountID" can be set to multitenant string, e.g. http://{vminsert}:8480/insert/multitenant/{suffix}.
     /// </summary>
-    public string? ClusterAccountId { get; set; } = "1";
-
-    public int? ClusterProjectId { get; set; } = 0;
+    public string? ClusterAccountId { get; set; } = "0";
 
     /// <summary>
     /// The cluster "select" node URI. This property will be used if <see cref="IsCluster"/> is true.
