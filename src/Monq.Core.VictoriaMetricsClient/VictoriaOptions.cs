@@ -38,7 +38,7 @@ public class VictoriaOptions
     /// <summary>
     /// The authentication auth type.
     /// </summary>
-    public AuthenticationTypes AuthenticationType { get; set; } = AuthenticationTypes.None;
+    public AuthenticationTypes AuthenticationType { get; set; } = AuthenticationTypes.BasicAuth;
 
     /// <summary>
     /// The username of the BasicAuth authentication mechanism.
