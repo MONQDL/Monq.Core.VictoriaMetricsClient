@@ -54,6 +54,9 @@ public static class DependencyInjectionExtensions
                 client.DefaultRequestHeaders.Add("X-Prometheus-Remote-Write-Version", "0.1.0");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-protobuf"));
             }
+            
+            VictoriaConstants.MetricsRequestLabels.AddUserspaceIdLabelPrefix(victoriaOptions.SystemLabelPrefix);
+            VictoriaConstants.MetricsRequestLabels.AddStreamIdLabelPrefix(victoriaOptions.SystemLabelPrefix);
         };
         return configurationFunc;
     }
