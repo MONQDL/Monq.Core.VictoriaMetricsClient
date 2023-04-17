@@ -56,6 +56,11 @@ public class VictoriaOptions
     /// If true, than use the http v2 connection protocol.
     /// </summary>
     public bool UseHttpV2 { get; set; } = true;
+
+    /// <summary>
+    /// Prefix for system labels.
+    /// </summary>
+    public string SystemLabelPrefix { get; set; } = "system_";
 }
 
 public enum AuthenticationTypes

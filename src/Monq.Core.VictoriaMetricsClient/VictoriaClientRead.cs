@@ -5,11 +5,11 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static Monq.Core.VictoriaMetricsClient.VictoriaConstants.MetricsRequestLabels;
+using Microsoft.Extensions.Options;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
-public class VictoriaClientRead :IVictoriaClientRead
+public class VictoriaClientRead : IVictoriaClientRead
 {
     static readonly JsonSerializerOptions _defaultJsonOptions =
         new JsonSerializerOptions
@@ -20,15 +20,19 @@ public class VictoriaClientRead :IVictoriaClientRead
     public static JsonSerializerOptions DefaultJsonOptions => _defaultJsonOptions;
 
     readonly HttpClient _httpClient;
+    readonly VictoriaOptions _victoriaOptions;
 
     static VictoriaClientRead()
     {
         _defaultJsonOptions.Converters.Add(new JsonStringEnumConverter());
     }
 
-    public VictoriaClientRead(HttpClient httpClient)
+    public VictoriaClientRead(HttpClient httpClient, IOptions<VictoriaOptions> victoriaOptions)
     {
         _httpClient = httpClient;
+        _victoriaOptions =
+            victoriaOptions?.Value 
+            ?? throw new StorageConfigurationException("There is no configuration found for the VictoriaMetrics.");
     }
 
     /// <inheritdoc />
@@ -48,8 +52,8 @@ public class VictoriaClientRead :IVictoriaClientRead
         var contentParams = new Dictionary<string, string>
         {
             { "query", query },
-            { "extra_filters[]", $"{{{StreamIdLabelName}=~\"{string.Join("|", streamIds)}\"}}" },
-            { "extra_label", $"{UserspaceIdLabelName}={userspaceId}" },
+            { "extra_filters[]", $"{{{_victoriaOptions.GetStreamIdLabelName()}=~\"{string.Join("|", streamIds)}\"}}" },
+            { "extra_label", $"{_victoriaOptions.GetUserspaceIdLabelName()}={userspaceId}" },
             { "step", step }
         };
         return await GetQueryData("query", contentParams);
@@ -74,8 +78,8 @@ public class VictoriaClientRead :IVictoriaClientRead
         var contentParams = new Dictionary<string, string>
         {
             { "query", query },
-            { "extra_filters[]", $"{{{StreamIdLabelName}=~\"{string.Join("|", streamIds)}\"}}" },
-            { "extra_label", $"{UserspaceIdLabelName}={userspaceId}" },
+            { "extra_filters[]", $"{{{_victoriaOptions.GetStreamIdLabelName()}=~\"{string.Join("|", streamIds)}\"}}" },
+            { "extra_label", $"{_victoriaOptions.GetUserspaceIdLabelName()}={userspaceId}" },
             { "start", $"{start.ToUnixTimeSeconds()}" },
             { "end", $"{end.ToUnixTimeSeconds()}" },
             { "step", step.ToPromQlInterval() }

@@ -4,7 +4,7 @@ using Monq.Core.VictoriaMetricsClient.Models;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using static Monq.Core.VictoriaMetricsClient.VictoriaConstants.MetricsRequestLabels;
+using Microsoft.Extensions.Options;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
@@ -20,16 +20,23 @@ public class VictoriaProxyClient : IVictoriaProxyClient
 
     readonly HttpClient _httpClient;
     readonly ILogger<VictoriaProxyClient> _log;
+    readonly VictoriaOptions _victoriaOptions;
 
     static VictoriaProxyClient()
     {
         _defaultJsonOptions.Converters.Add(new JsonStringEnumConverter());
     }
 
-    public VictoriaProxyClient(HttpClient httpClient, ILogger<VictoriaProxyClient> log)
+    public VictoriaProxyClient(
+        HttpClient httpClient,
+        ILogger<VictoriaProxyClient> log,
+        IOptions<VictoriaOptions> victoriaOptions)
     {
         _log = log;
         _httpClient = httpClient;
+        _victoriaOptions =
+            victoriaOptions?.Value 
+            ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
     }
 
     /// <inheritdoc />
@@ -124,8 +131,8 @@ public class VictoriaProxyClient : IVictoriaProxyClient
 
         var contentParams = new Dictionary<string, string>()
         {
-            { "extra_filters[]", $"{{{StreamIdLabelName}=~\"{string.Join("|", streamIds)}\"}}" },
-            { "extra_label", $"{UserspaceIdLabelName}={userspaceId}" },
+            { "extra_filters[]", $"{{{_victoriaOptions.GetStreamIdLabelName()}=~\"{string.Join("|", streamIds)}\"}}" },
+            { "extra_label", $"{_victoriaOptions.GetUserspaceIdLabelName()}={userspaceId}" },
         };
 
         foreach (var queryParam in requestQuery)
