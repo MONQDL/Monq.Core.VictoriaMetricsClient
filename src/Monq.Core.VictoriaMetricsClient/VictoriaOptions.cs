@@ -60,7 +60,7 @@ public class VictoriaOptions
     /// <summary>
     /// Prefix for system labels.
     /// </summary>
-    public string SystemLabelPrefix { get; set; } = "system_";
+    public string SystemLabelPrefix { get; set; } = "monq_";
 }
 
 public enum AuthenticationTypes
