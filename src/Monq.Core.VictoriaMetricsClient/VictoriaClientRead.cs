@@ -1,11 +1,9 @@
-﻿using Monq.Core.VictoriaMetricsClient.Extensions;
+﻿using Microsoft.Extensions.Options;
+using Monq.Core.VictoriaMetricsClient.Extensions;
 using Monq.Core.VictoriaMetricsClient.Models;
-using System.Net.Http.Headers;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Options;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
@@ -31,7 +29,7 @@ public class VictoriaClientRead : IVictoriaClientRead
     {
         _httpClient = httpClient;
         _victoriaOptions =
-            victoriaOptions?.Value 
+            victoriaOptions?.Value
             ?? throw new StorageConfigurationException("There is no configuration found for the VictoriaMetrics.");
     }
 
