@@ -1,5 +1,4 @@
-﻿using Monq.Core.VictoriaMetricsClient.Models;
-using PrometheusGrpc;
+﻿using PrometheusGrpc;
 
 namespace Monq.Core.VictoriaMetricsClient;
 

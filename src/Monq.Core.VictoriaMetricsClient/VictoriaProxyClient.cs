@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Monq.Core.VictoriaMetricsClient.Models;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.Extensions.Options;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
@@ -16,6 +16,7 @@ public class VictoriaProxyClient : IVictoriaProxyClient
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             NumberHandling = JsonNumberHandling.AllowReadingFromString
         };
+
     public static JsonSerializerOptions DefaultJsonOptions => _defaultJsonOptions;
 
     readonly HttpClient _httpClient;
@@ -35,12 +36,12 @@ public class VictoriaProxyClient : IVictoriaProxyClient
         _log = log;
         _httpClient = httpClient;
         _victoriaOptions =
-            victoriaOptions?.Value 
+            victoriaOptions?.Value
             ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
     }
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery) => 
+    public ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery) =>
         AllGrantedRequest("labels", requestQuery);
 
     /// <inheritdoc />
@@ -81,7 +82,7 @@ public class VictoriaProxyClient : IVictoriaProxyClient
             DefaultRequest("query_exemplars", requestQuery, userspaceId, streamIds);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Metadata(IQueryCollection requestQuery) => 
+    public ValueTask<BaseResponseModel> Metadata(IQueryCollection requestQuery) =>
         AllGrantedRequest("metadata", requestQuery);
 
     /// <inheritdoc />

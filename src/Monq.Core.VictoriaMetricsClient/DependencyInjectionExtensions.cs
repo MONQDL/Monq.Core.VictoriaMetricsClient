@@ -76,11 +76,11 @@ public static class DependencyInjectionExtensions
         switch (clusterNodeType)
         {
             case ClusterNodeTypes.Read:
-                client.BaseAddress = new Uri(new Uri(options.ClusterSelectUri), 
+                client.BaseAddress = new Uri(new Uri(options.ClusterSelectUri),
                     $"select/{accountId}/prometheus/api/v1/");
                 break;
             case ClusterNodeTypes.Write:
-                client.BaseAddress = new Uri(new Uri(options.ClusterInsertUri), 
+                client.BaseAddress = new Uri(new Uri(options.ClusterInsertUri),
                     $"insert/{accountId}/prometheus/api/v1/");
                 break;
         }
