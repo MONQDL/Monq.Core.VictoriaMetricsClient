@@ -48,9 +48,10 @@ public class VictoriaProxyClient : IVictoriaProxyClient
     public ValueTask<BaseResponseModel> LabelValues(string label,
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds)
+        IEnumerable<long> streamIds,
+        bool allowSkipExtraContent)
     {
-        if (label == "__name__")
+        if (allowSkipExtraContent && label == "__name__")
             return AllGrantedRequest($"label/{label}/values", requestQuery);
         else
             return DefaultRequest($"label/{label}/values", requestQuery, userspaceId, streamIds);
