@@ -16,6 +16,15 @@ public interface IVictoriaProxyClient
     ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery);
 
     /// <summary>
+    /// Execute a request to read the list of labels with forwarding query parameters.
+    /// </summary>
+    /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
+    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <returns></returns>
+    ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery, long userspaceId, IEnumerable<long> streamIds);
+
+    /// <summary>
     /// Execute a request to read the label values with forwarding query parameters.
     /// </summary>
     /// <param name="label"></param>

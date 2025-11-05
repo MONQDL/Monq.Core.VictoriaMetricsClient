@@ -45,6 +45,10 @@ public class VictoriaProxyClient : IVictoriaProxyClient
         AllGrantedRequest("labels", requestQuery);
 
     /// <inheritdoc />
+    public ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery, long userspaceId,
+        IEnumerable<long> streamIds) => DefaultRequest("labels", requestQuery, userspaceId, streamIds);
+
+    /// <inheritdoc />
     public ValueTask<BaseResponseModel> LabelValues(string label,
         IQueryCollection requestQuery,
         long userspaceId,
