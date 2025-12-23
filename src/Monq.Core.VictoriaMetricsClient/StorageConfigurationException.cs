@@ -1,25 +1,14 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
 /// <summary>
-/// The exuption is using in the VictoriaMetrics configuration methods.
+/// The exeption is using in the VictoriaMetrics configuration methods.
 /// </summary>
 public class StorageConfigurationException : Exception
 {
     /// <summary>Initializes a new instance of the <see cref="StorageConfigurationException" /> class.</summary>
     public StorageConfigurationException()
-    {
-
-    }
-
-    /// <summary>Initializes a new instance of the <see cref="StorageConfigurationException" /> class with serialized data.</summary>
-    /// <param name="info">The <see cref="SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
-    /// <param name="context">The <see cref="StreamingContext" /> that contains contextual information about the source or destination.</param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="info" /> is <see langword="null" />.</exception>
-    /// <exception cref="SerializationException">The class name is <see langword="null" /> or <see cref="Exception.HResult" /> is zero (0).</exception>
-    protected StorageConfigurationException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
 
     }

@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 
 namespace Monq.Core.VictoriaMetricsClient;
@@ -8,13 +9,14 @@ namespace Monq.Core.VictoriaMetricsClient;
 public static class DependencyInjectionExtensions
 {
     /// <summary>
-    /// Adds Victoria Metrics Http Cient. 
+    /// Adds Victoria Metrics Http Client.
     /// Use <see cref="IVictoriaClientRead"/> or <see cref="IVictoriaClientWrite"/> 
     /// or <see cref="IVictoriaProxyClient"/> in services.
     /// </summary>
     /// <param name="services"></param>
     /// <param name="configuration"></param>
     /// <returns></returns>
+    [RequiresUnreferencedCode("Configuration binding requires unreferenced code")]
     public static IServiceCollection AddVictoriaMetricsHttpClient(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<VictoriaOptions>(configuration);
@@ -33,11 +35,7 @@ public static class DependencyInjectionExtensions
         Action<IServiceProvider, HttpClient> configurationFunc = (provider, client) =>
         {
             var options = provider.GetRequiredService<IOptions<VictoriaOptions>>();
-            var victoriaOptions = options.Value;
-
-            if (victoriaOptions is null)
-                throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
-
+            var victoriaOptions = options.Value ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
             if (victoriaOptions.IsCluster)
                 client.ConfigureVictoriaMetricsAsCluster(victoriaOptions, clusterNodeType);
             else
@@ -66,7 +64,7 @@ public static class DependencyInjectionExtensions
             throw new StorageConfigurationException("""You must specify the "clusterSelectUri" configuration property.""");
 
         const string multitenant = "multitenant";
-        string accountId = string.Empty;
+        var accountId = string.Empty;
 
         if (options.ClusterAccountId == multitenant)
             accountId = multitenant;

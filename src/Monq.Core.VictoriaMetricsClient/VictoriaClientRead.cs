@@ -1,29 +1,16 @@
-﻿using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using Monq.Core.VictoriaMetricsClient.Extensions;
 using Monq.Core.VictoriaMetricsClient.Models;
+using Monq.Core.VictoriaMetricsClient.SerializerContexts;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
-public class VictoriaClientRead : IVictoriaClientRead
+public sealed class VictoriaClientRead : IVictoriaClientRead
 {
-    static readonly JsonSerializerOptions _defaultJsonOptions =
-        new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
-        };
-    public static JsonSerializerOptions DefaultJsonOptions => _defaultJsonOptions;
-
     readonly HttpClient _httpClient;
     readonly VictoriaOptions _victoriaOptions;
-
-    static VictoriaClientRead()
-    {
-        _defaultJsonOptions.Converters.Add(new JsonStringEnumConverter());
-    }
 
     public VictoriaClientRead(HttpClient httpClient, IOptions<VictoriaOptions> victoriaOptions)
     {
@@ -96,7 +83,7 @@ public class VictoriaClientRead : IVictoriaClientRead
         }
         catch (Exception e)
         {
-            throw new StorageException($"Storage throws exeption on request. Details: {e.Message}", e);
+            throw new StorageException($"Storage throws exception on request. Details: {e.Message}", e);
         }
 
         if (!response.IsSuccessStatusCode)
@@ -104,13 +91,16 @@ public class VictoriaClientRead : IVictoriaClientRead
                 "Can't read message due to exception. " +
                 $"Details: {await response.Content.ReadAsStringAsync()}");
 
-        var responseMessage = await response.Content.ReadFromJsonAsync<BaseResponseModel>(_defaultJsonOptions);
+        var responseMessage = await response.Content
+            .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel);
         if (responseMessage is null)
             throw new StorageException("Storage responded with empty message.");
 
         if (responseMessage.Status == PrometheusResponseStatuses.error)
             throw new StorageException($"Storage responded with status Error. Details: {responseMessage.Error}");
-        var result = responseMessage.Data.Deserialize<BaseQueryDataResponse>(_defaultJsonOptions);
+        var result = responseMessage.Data?
+            .Deserialize(BaseQueryDataResponseSerializerContext.Default.BaseQueryDataResponse);
+
         if (result is null)
             throw new StorageException("""Storage responded with empty "data" message.""");
         return result;

@@ -4,7 +4,7 @@ using Monq.Core.VictoriaMetricsClient.Models;
 namespace Monq.Core.VictoriaMetricsClient;
 
 /// <summary>
-/// The client proxies requests to Vicroria Metrics with the addition of extra_labels.
+/// The client proxies requests to VictoriaMetrics with the addition of extra_labels.
 /// </summary>
 public interface IVictoriaProxyClient
 {
@@ -31,7 +31,7 @@ public interface IVictoriaProxyClient
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
     /// <param name="streamIds">List of thread IDs available to the user.</param>
-    /// <param name="allowSkipExtraContent">Allow skip extra content with stremIds and userspaceId for label `__name__`.</param>
+    /// <param name="allowSkipExtraContent">Allow skip extra content with streamIds and userspaceId for label `__name__`.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> LabelValues(string label,
         IQueryCollection requestQuery,

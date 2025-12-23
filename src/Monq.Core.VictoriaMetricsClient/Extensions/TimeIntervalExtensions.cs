@@ -1,4 +1,4 @@
-﻿using Monq.Core.VictoriaMetricsClient.Models;
+using Monq.Core.VictoriaMetricsClient.Models;
 
 namespace Monq.Core.VictoriaMetricsClient.Extensions;
 
@@ -25,7 +25,7 @@ public static class TimeIntervalExtensions
 
     /// <summary>
     /// Convert the <paramref name="timeInterval"/> object to a string value 
-    /// compatible with the PromQL timeinterval query.
+    /// compatible with the PromQL time interval query.
     /// </summary>
     /// <param name="timeInterval">Time interval.</param>
     /// <returns></returns>

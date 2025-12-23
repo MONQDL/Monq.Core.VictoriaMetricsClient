@@ -1,15 +1,22 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace Monq.Core.VictoriaMetricsClient.Models;
 
 /// <summary>
-/// Базовая модель ответа Prometheus.
+/// Prometheus base response model.
 /// </summary>
-public class BaseResponseModel
+public sealed class BaseResponseModel
 {
-    public PrometheusResponseStatuses Status { get; set; }
-    public JsonNode Data { get; set; }
+    /// <summary>
+    /// Prometheus response status.
+    /// </summary>
+    public required PrometheusResponseStatuses Status { get; init; }
+
+    /// <summary>
+    /// Response data.
+    /// </summary>
+    public JsonNode? Data { get; init; }
 
     /// <summary>
     /// Only set if status is "error". The data field may still hold additional data.
@@ -17,6 +24,9 @@ public class BaseResponseModel
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? ErrorType { get; set; }
 
+    /// <summary>
+    /// Error message.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Error { get; set; }
 
