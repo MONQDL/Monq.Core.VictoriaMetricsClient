@@ -4,8 +4,6 @@ using Microsoft.Extensions.Options;
 using Monq.Core.VictoriaMetricsClient.Models;
 using Monq.Core.VictoriaMetricsClient.SerializerContexts;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Monq.Core.VictoriaMetricsClient;
 

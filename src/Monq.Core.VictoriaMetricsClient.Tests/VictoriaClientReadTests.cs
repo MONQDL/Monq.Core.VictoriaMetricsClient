@@ -306,7 +306,7 @@ public class VictoriaClientReadTests
         var step = "15s";
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var expectedResponse = new BaseResponseModel
         {
             Status = PrometheusResponseStatuses.success,
@@ -322,9 +322,9 @@ public class VictoriaClientReadTests
             }
             """)
         };
-        
+
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -347,6 +347,89 @@ public class VictoriaClientReadTests
         Assert.Equal(QueryResultTypes.matrix, result.ResultType);
         Assert.NotNull(result.Result);
         Assert.Single(result.Result);
+
+        // Verify that the result contains the expected values from the JSON response
+        var firstResult = result.Result[0];
+        var metric = firstResult["metric"];
+        var values = firstResult["values"];
+
+        Assert.NotNull(metric);
+        Assert.NotNull(values);
+        Assert.Equal("up", metric["__name__"].ToString());
+        Assert.Equal("prometheus", metric["job"].ToString());
+        Assert.Equal(2, values.AsArray().Count);
+    }
+
+    [Fact(DisplayName = "[Query] Проверка содержимого результата ответа VictoriaMetrics")]
+    public async Task Query_WithSuccessVictoriaMetricsResponse_ShouldReturnCorrectResultWithExpectedValues()
+    {
+        // Arrange
+        var query = "up";
+        var step = "15s";
+        var streamIds = new List<long> { 1, 2, 3 };
+        var userspaceId = 100L;
+
+        var expectedResponse = new BaseResponseModel
+        {
+            Status = PrometheusResponseStatuses.success,
+            Data = JsonNode.Parse("""
+            {
+              "resultType": "matrix",
+              "result": [
+                {
+                  "metric": { "__name__": "up", "job": "prometheus" },
+                  "values": [[1565133785.061, "1"], [1565133845.061, "1"]]
+                }
+              ]
+            }
+            """)
+        };
+
+        var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
+
+        _httpMessageHandlerMock
+            .Protected()
+            .Setup<Task<HttpResponseMessage>>(
+                "SendAsync",
+                ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
+            });
+
+        var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
+
+        // Act
+        var result = await client.Query(query, step, streamIds, userspaceId);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(QueryResultTypes.matrix, result.ResultType);
+        Assert.NotNull(result.Result);
+        Assert.Single(result.Result);
+
+        // Verify that the result contains the expected values from the JSON response
+        var firstResult = result.Result[0];
+        var metric = firstResult["metric"];
+        var values = firstResult["values"];
+
+        Assert.NotNull(metric);
+        Assert.NotNull(values);
+        Assert.Equal("up", metric["__name__"].ToString());
+        Assert.Equal("prometheus", metric["job"].ToString());
+        Assert.Equal(2, values.AsArray().Count);
+
+        // Check the first value
+        var firstValue = values[0];
+        Assert.Equal("1565133785.061", firstValue[0].ToString());
+        Assert.Equal("1", firstValue[1].ToString());
+
+        // Check the second value
+        var secondValue = values[1];
+        Assert.Equal("1565133845.061", secondValue[0].ToString());
+        Assert.Equal("1", secondValue[1].ToString());
     }
 
     [Fact(DisplayName = "[Query] Ошибка HTTP клиента должна приводить к StorageException")]
