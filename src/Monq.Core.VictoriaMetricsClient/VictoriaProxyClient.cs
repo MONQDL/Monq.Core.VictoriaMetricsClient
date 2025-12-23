@@ -2,31 +2,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Monq.Core.VictoriaMetricsClient.Models;
+using Monq.Core.VictoriaMetricsClient.SerializerContexts;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
-public class VictoriaProxyClient : IVictoriaProxyClient
+public sealed class VictoriaProxyClient : IVictoriaProxyClient
 {
-    static readonly JsonSerializerOptions _defaultJsonOptions =
-        new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            NumberHandling = JsonNumberHandling.AllowReadingFromString
-        };
-
-    public static JsonSerializerOptions DefaultJsonOptions => _defaultJsonOptions;
-
     readonly HttpClient _httpClient;
     readonly ILogger<VictoriaProxyClient> _log;
     readonly VictoriaOptions _victoriaOptions;
-
-    static VictoriaProxyClient()
-    {
-        _defaultJsonOptions.Converters.Add(new JsonStringEnumConverter());
-    }
 
     public VictoriaProxyClient(
         HttpClient httpClient,
@@ -53,7 +38,7 @@ public class VictoriaProxyClient : IVictoriaProxyClient
         IQueryCollection requestQuery,
         long userspaceId,
         IEnumerable<long> streamIds,
-        bool allowSkipExtraContent)
+        bool allowSkipExtraContent = true)
     {
         if (allowSkipExtraContent && label == "__name__")
             return AllGrantedRequest($"label/{label}/values", requestQuery);
@@ -106,8 +91,8 @@ public class VictoriaProxyClient : IVictoriaProxyClient
         }
         catch (Exception e)
         {
-            var message = $"Storage throws exeption on request. Details: {e.Message}";
-            _log.LogError(message, e);
+            var message = $"Storage throws exception on request. Details: {e.Message}";
+            _log.LogError(e, message);
             return new BaseResponseModel
             {
                 Error = message,
@@ -115,15 +100,37 @@ public class VictoriaProxyClient : IVictoriaProxyClient
             };
         }
 
-        var responseMessage = await response.Content.ReadFromJsonAsync<BaseResponseModel>(_defaultJsonOptions);
-        if (responseMessage is null)
+        string responseContent = await response.Content.ReadAsStringAsync();
+        if (string.IsNullOrEmpty(responseContent))
+        {
             return new BaseResponseModel
             {
                 Error = "Storage responded with empty message.",
                 Status = PrometheusResponseStatuses.error
             };
+        }
 
-        return responseMessage;
+        try
+        {
+            var responseMessage = await response.Content
+                .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel);
+            if (responseMessage is null)
+                return new BaseResponseModel
+                {
+                    Error = "Storage responded with empty message.",
+                    Status = PrometheusResponseStatuses.error
+                };
+
+            return responseMessage;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return new BaseResponseModel
+            {
+                Error = "Storage responded with invalid JSON.",
+                Status = PrometheusResponseStatuses.error
+            };
+        }
     }
 
     async ValueTask<BaseResponseModel> DefaultRequest(string requestUri, IQueryCollection requestQuery,

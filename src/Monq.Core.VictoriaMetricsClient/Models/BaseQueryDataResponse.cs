@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 
 namespace Monq.Core.VictoriaMetricsClient.Models;
 
-public class BaseQueryDataResponse
+public sealed class BaseQueryDataResponse
 {
-    public QueryResultTypes ResultType { get; set; }
-    public JsonArray Result { get; set; }
+    public required QueryResultTypes ResultType { get; init; }
+    public required JsonArray Result { get; init; }
 }

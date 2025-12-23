@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
@@ -9,17 +9,6 @@ public class StorageException : Exception
 {
     /// <summary>Initializes a new instance of the <see cref="StorageException" /> class.</summary>
     public StorageException()
-    {
-
-    }
-
-    /// <summary>Initializes a new instance of the <see cref="StorageException" /> class with serialized data.</summary>
-    /// <param name="info">The <see cref="SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
-    /// <param name="context">The <see cref="StreamingContext" /> that contains contextual information about the source or destination.</param>
-    /// <exception cref="ArgumentNullException">
-    /// <paramref name="info" /> is <see langword="null" />.</exception>
-    /// <exception cref="SerializationException">The class name is <see langword="null" /> or <see cref="Exception.HResult" /> is zero (0).</exception>
-    protected StorageException(SerializationInfo info, StreamingContext context) : base(info, context)
     {
 
     }
