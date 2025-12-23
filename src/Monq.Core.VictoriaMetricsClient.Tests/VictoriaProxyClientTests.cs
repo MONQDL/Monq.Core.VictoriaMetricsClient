@@ -1,21 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Moq;
-using Moq.Protected;
-using Xunit;
 using Monq.Core.VictoriaMetricsClient.Models;
 using Monq.Core.VictoriaMetricsClient.SerializerContexts;
+using Moq;
+using Moq.Protected;
+using System.Net;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Monq.Core.VictoriaMetricsClient.Tests;
 
@@ -58,7 +51,7 @@ public class VictoriaProxyClientTests
         nullOptionsMock.Setup(x => x.Value).Returns((VictoriaOptions)null);
 
         // Act & Assert
-        Assert.Throws<StorageConfigurationException>(() => 
+        Assert.Throws<StorageConfigurationException>(() =>
             new VictoriaProxyClient(_httpClient, _loggerMock.Object, nullOptionsMock.Object));
     }
 
@@ -140,7 +133,7 @@ public class VictoriaProxyClientTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Labels(queryCollection.Object, 100, new List<long>())); // Empty list
-        
+
         Assert.Contains("no streamIds set", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -156,7 +149,7 @@ public class VictoriaProxyClientTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Labels(queryCollection.Object, -1, new List<long> { 1, 2, 3 }));
-        
+
         Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -172,7 +165,7 @@ public class VictoriaProxyClientTests
         // Act & Assert
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Labels(queryCollection.Object, 0, new List<long> { 1, 2, 3 }));
-        
+
         Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
