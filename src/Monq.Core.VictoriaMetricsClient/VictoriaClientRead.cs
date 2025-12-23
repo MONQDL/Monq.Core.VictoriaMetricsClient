@@ -87,7 +87,7 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         }
 
         if (!response.IsSuccessStatusCode)
-            throw new StorageException($"Storage. Victoria responded with status code: {response.StatusCode}. " +
+            throw new StorageException($"Storage. Victoria responded with status code: {(int)response.StatusCode}. " +
                 "Can't read message due to exception. " +
                 $"Details: {await response.Content.ReadAsStringAsync()}");
 
@@ -98,8 +98,16 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
 
         if (responseMessage.Status == PrometheusResponseStatuses.error)
             throw new StorageException($"Storage responded with status Error. Details: {responseMessage.Error}");
-        var result = responseMessage.Data?
-            .Deserialize(BaseQueryDataResponseSerializerContext.Default.BaseQueryDataResponse);
+        BaseQueryDataResponse? result;
+        try
+        {
+            result = responseMessage.Data?
+                .Deserialize(BaseQueryDataResponseSerializerContext.Default.BaseQueryDataResponse);
+        }
+        catch (JsonException e)
+        {
+            throw new StorageException($"""Storage "data" field can't be deserialized. Message: '{e.Message}'""", e);
+        }
 
         if (result is null)
             throw new StorageException("""Storage responded with empty "data" message.""");

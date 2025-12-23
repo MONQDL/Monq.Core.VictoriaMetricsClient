@@ -1,4 +1,4 @@
-﻿using Google.Protobuf;
+using Google.Protobuf;
 using PrometheusGrpc;
 using System.Net.Http.Headers;
 
@@ -32,7 +32,7 @@ public class VictoriaClientWrite : IVictoriaClientWrite
         }
 
         if (!response.IsSuccessStatusCode)
-            throw new StorageException($"Storage. Victoria responded with status code: {response.StatusCode}. " +
+            throw new StorageException($"Storage. Victoria responded with status code: {(int)response.StatusCode}. " +
                 $"Can't store message due to exception. " +
                 $"Details: {await response.Content.ReadAsStringAsync()}");
     }
