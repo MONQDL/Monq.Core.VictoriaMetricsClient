@@ -100,16 +100,37 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
             };
         }
 
-        var responseMessage = await response.Content
-            .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        if (responseMessage is null)
+        string responseContent = await response.Content.ReadAsStringAsync();
+        if (string.IsNullOrEmpty(responseContent))
+        {
             return new BaseResponseModel
             {
                 Error = "Storage responded with empty message.",
                 Status = PrometheusResponseStatuses.error
             };
+        }
 
-        return responseMessage;
+        try
+        {
+            var responseMessage = await response.Content
+                .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel);
+            if (responseMessage is null)
+                return new BaseResponseModel
+                {
+                    Error = "Storage responded with empty message.",
+                    Status = PrometheusResponseStatuses.error
+                };
+
+            return responseMessage;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return new BaseResponseModel
+            {
+                Error = "Storage responded with invalid JSON.",
+                Status = PrometheusResponseStatuses.error
+            };
+        }
     }
 
     async ValueTask<BaseResponseModel> DefaultRequest(string requestUri, IQueryCollection requestQuery,
