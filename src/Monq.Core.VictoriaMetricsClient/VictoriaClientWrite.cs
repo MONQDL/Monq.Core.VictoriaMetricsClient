@@ -1,4 +1,5 @@
 using Google.Protobuf;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
 using PrometheusGrpc;
 using System.Net.Http.Headers;
 

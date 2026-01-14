@@ -1,4 +1,4 @@
-namespace Monq.Core.VictoriaMetricsClient;
+namespace Monq.Core.VictoriaMetricsClient.Extensions;
 
 /// <summary>
 /// The VictoriaMetrics client connection options extensions.
@@ -12,9 +12,7 @@ public static class VictoriaOptionsExtensions
     /// <param name="options">The VictoriaMetrics client connection options</param>
     /// <returns></returns>
     public static string GetUserspaceIdLabelName(this VictoriaOptions options)
-    {
-        return options.SystemLabelPrefix + VictoriaConstants.MetricsRequestLabels.UserspaceIdLabelName;
-    }
+        => options.SystemLabelPrefix + VictoriaConstants.MetricsRequestLabels.UserspaceIdLabelName;
 
     /// <summary>
     /// Get add stream id label.
@@ -22,7 +20,5 @@ public static class VictoriaOptionsExtensions
     /// <param name="options">The VictoriaMetrics client connection options</param>
     /// <returns></returns>
     public static string GetStreamIdLabelName(this VictoriaOptions options)
-    {
-        return options.SystemLabelPrefix + VictoriaConstants.MetricsRequestLabels.StreamIdLabelName;
-    }
+        => options.SystemLabelPrefix + VictoriaConstants.MetricsRequestLabels.StreamIdLabelName;
 }

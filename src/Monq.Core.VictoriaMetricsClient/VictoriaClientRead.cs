@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
 using Monq.Core.VictoriaMetricsClient.Extensions;
 using Monq.Core.VictoriaMetricsClient.Models;
 using Monq.Core.VictoriaMetricsClient.SerializerContexts;
@@ -12,7 +13,9 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
     readonly HttpClient _httpClient;
     readonly VictoriaOptions _victoriaOptions;
 
-    public VictoriaClientRead(HttpClient httpClient, IOptions<VictoriaOptions> victoriaOptions)
+    public VictoriaClientRead(
+        HttpClient httpClient,
+        IOptions<VictoriaOptions> victoriaOptions)
     {
         _httpClient = httpClient;
         _victoriaOptions =
@@ -21,7 +24,8 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
     }
 
     /// <inheritdoc />
-    public async ValueTask<BaseQueryDataResponse> Query(string query,
+    public async ValueTask<BaseQueryDataResponse> Query(
+        string query,
         string step,
         IEnumerable<long> streamIds,
         long userspaceId)
@@ -45,7 +49,8 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
     }
 
     /// <inheritdoc />
-    public async ValueTask<BaseQueryDataResponse> QueryRange(string query,
+    public async ValueTask<BaseQueryDataResponse> QueryRange(
+        string query,
         DateTimeOffset start,
         DateTimeOffset end,
         TimeInterval step,
@@ -92,9 +97,8 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
                 $"Details: {await response.Content.ReadAsStringAsync()}");
 
         var responseMessage = await response.Content
-            .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        if (responseMessage is null)
-            throw new StorageException("Storage responded with empty message.");
+            .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel)
+            ?? throw new StorageException("Storage responded with empty message.");
 
         if (responseMessage.Status == PrometheusResponseStatuses.error)
             throw new StorageException($"Storage responded with status Error. Details: {responseMessage.Error}");

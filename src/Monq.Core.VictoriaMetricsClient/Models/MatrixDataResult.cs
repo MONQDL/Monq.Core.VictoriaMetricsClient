@@ -1,7 +1,17 @@
-﻿namespace Monq.Core.VictoriaMetricsClient.Models;
+namespace Monq.Core.VictoriaMetricsClient.Models;
 
+/// <summary>
+/// Matrix data result.
+/// </summary>
 public class MatrixDataResult
 {
-    public Dictionary<string, string> Metric { get; set; }
-    public IEnumerable<double[]> Values { get; set; }
+    /// <summary>
+    /// Metric.
+    /// </summary>
+    public Dictionary<string, string> Metric { get; set; } = [];
+
+    /// <summary>
+    /// Values.
+    /// </summary>
+    public IEnumerable<double[]> Values { get; set; } = [];
 }

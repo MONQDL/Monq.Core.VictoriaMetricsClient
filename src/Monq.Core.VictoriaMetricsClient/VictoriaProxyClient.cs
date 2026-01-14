@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
+using Monq.Core.VictoriaMetricsClient.Extensions;
 using Monq.Core.VictoriaMetricsClient.Models;
 using Monq.Core.VictoriaMetricsClient.SerializerContexts;
 using System.Net.Http.Json;
@@ -10,31 +12,34 @@ namespace Monq.Core.VictoriaMetricsClient;
 public sealed class VictoriaProxyClient : IVictoriaProxyClient
 {
     readonly HttpClient _httpClient;
-    readonly ILogger<VictoriaProxyClient> _log;
+    readonly ILogger<VictoriaProxyClient> _logger;
     readonly VictoriaOptions _victoriaOptions;
 
     public VictoriaProxyClient(
         HttpClient httpClient,
-        ILogger<VictoriaProxyClient> log,
+        ILogger<VictoriaProxyClient> logger,
         IOptions<VictoriaOptions> victoriaOptions)
     {
-        _log = log;
         _httpClient = httpClient;
-        _victoriaOptions =
-            victoriaOptions?.Value
+        _logger = logger;
+        _victoriaOptions = victoriaOptions?.Value
             ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
     }
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery) =>
-        AllGrantedRequest("labels", requestQuery);
+    public ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery)
+        => AllGrantedRequest("labels", requestQuery);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery, long userspaceId,
-        IEnumerable<long> streamIds) => DefaultRequest("labels", requestQuery, userspaceId, streamIds);
+    public ValueTask<BaseResponseModel> Labels(
+        IQueryCollection requestQuery,
+        long userspaceId,
+        IEnumerable<long> streamIds)
+        => DefaultRequest("labels", requestQuery, userspaceId, streamIds);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> LabelValues(string label,
+    public ValueTask<BaseResponseModel> LabelValues(
+        string label,
         IQueryCollection requestQuery,
         long userspaceId,
         IEnumerable<long> streamIds,
@@ -47,37 +52,44 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
     }
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Series(IQueryCollection requestQuery,
+    public ValueTask<BaseResponseModel> Series(
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds) => DefaultRequest("series", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds)
+        => DefaultRequest("series", requestQuery, userspaceId, streamIds);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Query(IQueryCollection requestQuery,
+    public ValueTask<BaseResponseModel> Query(
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds) => DefaultRequest("query", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds)
+        => DefaultRequest("query", requestQuery, userspaceId, streamIds);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> QueryRange(IQueryCollection requestQuery,
+    public ValueTask<BaseResponseModel> QueryRange(
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds) => DefaultRequest("query_range", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds)
+        => DefaultRequest("query_range", requestQuery, userspaceId, streamIds);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> BuildInfo(IQueryCollection requestQuery) =>
-        AllGrantedRequest("status/buildinfo", requestQuery);
+    public ValueTask<BaseResponseModel> BuildInfo(IQueryCollection requestQuery)
+        => AllGrantedRequest("status/buildinfo", requestQuery);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> QueryExemplars(IQueryCollection requestQuery,
+    public ValueTask<BaseResponseModel> QueryExemplars(
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds) =>
-            DefaultRequest("query_exemplars", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds)
+        => DefaultRequest("query_exemplars", requestQuery, userspaceId, streamIds);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Metadata(IQueryCollection requestQuery) =>
-        AllGrantedRequest("metadata", requestQuery);
+    public ValueTask<BaseResponseModel> Metadata(IQueryCollection requestQuery)
+        => AllGrantedRequest("metadata", requestQuery);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Rules(IQueryCollection requestQuery) =>
-        AllGrantedRequest("rules", requestQuery);
+    public ValueTask<BaseResponseModel> Rules(IQueryCollection requestQuery)
+        => AllGrantedRequest("rules", requestQuery);
 
     /// <inheritdoc />
     async ValueTask<BaseResponseModel> PostRequest(string requestUri, Dictionary<string, string> contentParams)
@@ -92,7 +104,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
         catch (Exception e)
         {
             var message = $"Storage throws exception on request. Details: {e.Message}";
-            _log.LogError(e, message);
+            _logger.LogError(e, message);
             return new BaseResponseModel
             {
                 Error = message,
@@ -100,7 +112,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
             };
         }
 
-        string responseContent = await response.Content.ReadAsStringAsync();
+        var responseContent = await response.Content.ReadAsStringAsync();
         if (string.IsNullOrEmpty(responseContent))
         {
             return new BaseResponseModel

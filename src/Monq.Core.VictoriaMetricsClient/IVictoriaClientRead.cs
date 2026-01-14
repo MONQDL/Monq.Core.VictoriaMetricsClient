@@ -1,24 +1,25 @@
-﻿using Monq.Core.VictoriaMetricsClient.Models;
+using Monq.Core.VictoriaMetricsClient.Models;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
 public interface IVictoriaClientRead
-
 {
     /// <summary>
-    /// Run a request to read metrics from the repository.
+    /// Run a query to read metrics from the storage.
     /// </summary>
     /// <returns></returns>
-    ValueTask<BaseQueryDataResponse> Query(string query,
+    ValueTask<BaseQueryDataResponse> Query(
+        string query,
         string step,
         IEnumerable<long> streamIds,
         long userspaceId);
 
     /// <summary>
-    /// Run a query to read the list of metrics by range from the storage.
+    /// Run a query to read metrics from the storage by date range.
     /// </summary>
     /// <returns></returns>
-    ValueTask<BaseQueryDataResponse> QueryRange(string query,
+    ValueTask<BaseQueryDataResponse> QueryRange(
+        string query,
         DateTimeOffset start,
         DateTimeOffset end,
         TimeInterval step,

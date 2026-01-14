@@ -1,4 +1,4 @@
-﻿namespace Monq.Core.VictoriaMetricsClient;
+namespace Monq.Core.VictoriaMetricsClient;
 
 /// <summary>
 /// The VictoriaMetrics client connection options.
@@ -63,8 +63,17 @@ public class VictoriaOptions
     public string SystemLabelPrefix { get; set; } = "monq_";
 }
 
+/// <summary>
+/// Authentication type.
+/// </summary>
 public enum AuthenticationTypes
 {
+    /// <summary>
+    /// None.
+    /// </summary>
     None,
+    /// <summary>
+    /// Basic authentication.
+    /// </summary>
     BasicAuth
 }

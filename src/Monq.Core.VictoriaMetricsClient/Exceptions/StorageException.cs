@@ -1,6 +1,4 @@
-using System.Runtime.Serialization;
-
-namespace Monq.Core.VictoriaMetricsClient;
+namespace Monq.Core.VictoriaMetricsClient.Exceptions;
 
 /// <summary>
 /// The exception is used in the methods of the metric storage class.

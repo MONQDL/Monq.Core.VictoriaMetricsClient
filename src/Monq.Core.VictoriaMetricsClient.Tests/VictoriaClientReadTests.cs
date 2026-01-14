@@ -1,28 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Options;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
+using Monq.Core.VictoriaMetricsClient.Models;
+using Monq.Core.VictoriaMetricsClient.SerializerContexts;
+using Moq;
+using Moq.Protected;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Moq;
-using Moq.Protected;
-using Xunit;
-using Monq.Core.VictoriaMetricsClient.Models;
-using Monq.Core.VictoriaMetricsClient.SerializerContexts;
 
 namespace Monq.Core.VictoriaMetricsClient.Tests;
 
 public class VictoriaClientReadTests
 {
-    private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
-    private readonly HttpClient _httpClient;
-    private readonly VictoriaOptions _victoriaOptions;
-    private readonly Mock<IOptions<VictoriaOptions>> _optionsMock;
+    readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
+    readonly HttpClient _httpClient;
+    readonly VictoriaOptions _victoriaOptions;
+    readonly Mock<IOptions<VictoriaOptions>> _optionsMock;
 
     public VictoriaClientReadTests()
     {
@@ -44,10 +38,10 @@ public class VictoriaClientReadTests
         var step = "15s";
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -155,9 +149,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
-        
+
         Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -171,10 +165,10 @@ public class VictoriaClientReadTests
         var step = new TimeInterval(15, TimeIntervalUnits.Seconds);
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -212,9 +206,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
-        
+
         Assert.Contains("query is null or empty", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -232,9 +226,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
-        
+
         Assert.Contains("query is null or empty", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -252,9 +246,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
-        
+
         Assert.Contains("no streamIds set", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -272,9 +266,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
-        
+
         Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -292,9 +286,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
-        
+
         Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -452,9 +446,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
-        
+
         Assert.Contains("Storage throws exception on request", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.IsType<HttpRequestException>(exception.InnerException);
     }
@@ -467,15 +461,15 @@ public class VictoriaClientReadTests
         var step = "15s";
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var errorResponse = new BaseResponseModel
         {
             Status = PrometheusResponseStatuses.error,
             Error = "Invalid query"
         };
-        
+
         var jsonContent = JsonSerializer.Serialize(errorResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -491,9 +485,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
-        
+
         Assert.Contains("Storage responded with status Error", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Invalid query", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -506,15 +500,15 @@ public class VictoriaClientReadTests
         var step = "15s";
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var emptyResponse = new BaseResponseModel
         {
             Status = PrometheusResponseStatuses.success,
             Data = null // No data
         };
-        
+
         var jsonContent = JsonSerializer.Serialize(emptyResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -530,9 +524,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
-        
+
         Assert.Contains("""Storage responded with empty "data" message.""", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -544,15 +538,15 @@ public class VictoriaClientReadTests
         var step = "15s";
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var emptyDataResponse = new BaseResponseModel
         {
             Status = PrometheusResponseStatuses.success,
             Data = JsonNode.Parse("{}") // Empty data object
         };
-        
+
         var jsonContent = JsonSerializer.Serialize(emptyDataResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -568,9 +562,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
-        
+
         Assert.Contains($"""Storage "data" field can't be deserialized. Message:""", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -598,9 +592,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
-        
+
         Assert.Contains("Storage. Victoria responded with status code: 500", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Internal Server Error", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
@@ -615,7 +609,7 @@ public class VictoriaClientReadTests
         var step = new TimeInterval(15, TimeIntervalUnits.Seconds);
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var expectedResponse = new BaseResponseModel
         {
             Status = PrometheusResponseStatuses.success,
@@ -631,9 +625,9 @@ public class VictoriaClientReadTests
             }
             """)
         };
-        
+
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -680,9 +674,9 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
-        
+
         Assert.Contains("Storage throws exception on request", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.IsType<HttpRequestException>(exception.InnerException);
     }
@@ -697,15 +691,15 @@ public class VictoriaClientReadTests
         var step = new TimeInterval(15, TimeIntervalUnits.Seconds);
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
-        
+
         var errorResponse = new BaseResponseModel
         {
             Status = PrometheusResponseStatuses.error,
             Error = "Invalid query"
         };
-        
+
         var jsonContent = JsonSerializer.Serialize(errorResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
-        
+
         _httpMessageHandlerMock
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
@@ -721,29 +715,27 @@ public class VictoriaClientReadTests
         var client = new VictoriaClientRead(_httpClient, _optionsMock.Object);
 
         // Act & Assert
-        var exception = await Assert.ThrowsAsync<StorageException>(async () => 
+        var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
-        
+
         Assert.Contains("Storage responded with status Error", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Invalid query", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
-    private BaseResponseModel CreateSuccessResponse()
-    {
-        return new BaseResponseModel
+    static BaseResponseModel CreateSuccessResponse()
+        => new()
         {
             Status = PrometheusResponseStatuses.success,
             Data = JsonNode.Parse("""
-            {
-              "resultType": "matrix",
-              "result": [
                 {
-                  "metric": { "__name__": "up", "job": "prometheus" },
-                  "values": [[1565133785.061, "1"], [1565133845.061, "1"]]
+                  "resultType": "matrix",
+                  "result": [
+                    {
+                      "metric": { "__name__": "up", "job": "prometheus" },
+                      "values": [[1565133785.061, "1"], [1565133845.061, "1"]]
+                    }
+                  ]
                 }
-              ]
-            }
-            """)
+                """)
         };
-    }
 }

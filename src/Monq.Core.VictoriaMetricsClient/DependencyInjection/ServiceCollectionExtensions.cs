@@ -1,12 +1,14 @@
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Monq.Core.VictoriaMetricsClient;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 
-namespace Monq.Core.VictoriaMetricsClient;
+#pragma warning disable IDE0130
+namespace Microsoft.Extensions.DependencyInjection;
 
-public static class DependencyInjectionExtensions
+public static class ServiceCollectionExtensions
 {
     /// <summary>
     /// Adds Victoria Metrics Http Client.
@@ -31,8 +33,7 @@ public static class DependencyInjectionExtensions
     }
 
     static Action<IServiceProvider, HttpClient> BuildConfiguration(ClusterNodeTypes clusterNodeType)
-    {
-        Action<IServiceProvider, HttpClient> configurationFunc = (provider, client) =>
+        => (provider, client) =>
         {
             var options = provider.GetRequiredService<IOptions<VictoriaOptions>>();
             var victoriaOptions = options.Value ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
@@ -53,8 +54,6 @@ public static class DependencyInjectionExtensions
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-protobuf"));
             }
         };
-        return configurationFunc;
-    }
 
     static void ConfigureVictoriaMetricsAsCluster(this HttpClient client, VictoriaOptions options, ClusterNodeTypes clusterNodeType)
     {
@@ -64,7 +63,7 @@ public static class DependencyInjectionExtensions
             throw new StorageConfigurationException("""You must specify the "clusterSelectUri" configuration property.""");
 
         const string multitenant = "multitenant";
-        var accountId = string.Empty;
+        string? accountId;
 
         if (options.ClusterAccountId == multitenant)
             accountId = multitenant;
