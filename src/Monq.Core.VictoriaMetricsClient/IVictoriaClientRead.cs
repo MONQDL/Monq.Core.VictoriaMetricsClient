@@ -12,7 +12,8 @@ public interface IVictoriaClientRead
         string query,
         string step,
         IEnumerable<long> streamIds,
-        long userspaceId);
+        long userspaceId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Run a query to read metrics from the storage by date range.
@@ -24,5 +25,6 @@ public interface IVictoriaClientRead
         DateTimeOffset end,
         TimeInterval step,
         IEnumerable<long> streamIds,
-        long userspaceId);
+        long userspaceId,
+        CancellationToken cancellationToken = default);
 }

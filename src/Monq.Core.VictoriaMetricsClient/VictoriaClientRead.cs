@@ -28,7 +28,8 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         string query,
         string step,
         IEnumerable<long> streamIds,
-        long userspaceId)
+        long userspaceId,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(query))
             throw new StorageException($"The {nameof(query)} is null or empty.");
@@ -45,7 +46,7 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
             { "extra_label", $"{_victoriaOptions.GetUserspaceIdLabelName()}={userspaceId}" },
             { "step", step }
         };
-        return await GetQueryData("query", contentParams);
+        return await GetQueryData("query", contentParams, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -55,7 +56,8 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         DateTimeOffset end,
         TimeInterval step,
         IEnumerable<long> streamIds,
-        long userspaceId)
+        long userspaceId,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(query))
             throw new StorageException($"The {nameof(query)} is null or empty.");
@@ -74,17 +76,20 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
             { "end", $"{end.ToUnixTimeSeconds()}" },
             { "step", step.ToPromQlInterval() }
         };
-        return await GetQueryData("query_range", contentParams);
+        return await GetQueryData("query_range", contentParams, cancellationToken);
     }
 
-    async Task<BaseQueryDataResponse> GetQueryData(string requestUri, Dictionary<string, string> contentParams)
+    async Task<BaseQueryDataResponse> GetQueryData(
+        string requestUri,
+        Dictionary<string, string> contentParams,
+        CancellationToken cancellationToken)
     {
         var content = new FormUrlEncodedContent(contentParams);
 
         HttpResponseMessage response;
         try
         {
-            response = await _httpClient.PostAsync(requestUri, content);
+            response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
         }
         catch (Exception e)
         {
@@ -94,10 +99,10 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         if (!response.IsSuccessStatusCode)
             throw new StorageException($"Storage. Victoria responded with status code: {(int)response.StatusCode}. " +
                 "Can't read message due to exception. " +
-                $"Details: {await response.Content.ReadAsStringAsync()}");
+                $"Details: {await response.Content.ReadAsStringAsync(cancellationToken)}");
 
         var responseMessage = await response.Content
-            .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel)
+            .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel, cancellationToken)
             ?? throw new StorageException("Storage responded with empty message.");
 
         if (responseMessage.Status == PrometheusResponseStatuses.error)

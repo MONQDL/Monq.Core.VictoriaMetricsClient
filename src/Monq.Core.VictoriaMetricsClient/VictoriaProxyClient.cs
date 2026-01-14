@@ -27,15 +27,18 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
     }
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery)
-        => AllGrantedRequest("labels", requestQuery);
+    public ValueTask<BaseResponseModel> Labels(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default)
+        => AllGrantedRequest("labels", requestQuery, cancellationToken);
 
     /// <inheritdoc />
     public ValueTask<BaseResponseModel> Labels(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds)
-        => DefaultRequest("labels", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default)
+        => DefaultRequest("labels", requestQuery, userspaceId, streamIds, cancellationToken);
 
     /// <inheritdoc />
     public ValueTask<BaseResponseModel> LabelValues(
@@ -43,63 +46,77 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
         IQueryCollection requestQuery,
         long userspaceId,
         IEnumerable<long> streamIds,
-        bool allowSkipExtraContent = true)
+        bool allowSkipExtraContent = true,
+        CancellationToken cancellationToken = default)
     {
         if (allowSkipExtraContent && label == "__name__")
-            return AllGrantedRequest($"label/{label}/values", requestQuery);
+            return AllGrantedRequest($"label/{label}/values", requestQuery, cancellationToken);
         else
-            return DefaultRequest($"label/{label}/values", requestQuery, userspaceId, streamIds);
+            return DefaultRequest($"label/{label}/values", requestQuery, userspaceId, streamIds, cancellationToken);
     }
 
     /// <inheritdoc />
     public ValueTask<BaseResponseModel> Series(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds)
-        => DefaultRequest("series", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default)
+        => DefaultRequest("series", requestQuery, userspaceId, streamIds, cancellationToken);
 
     /// <inheritdoc />
     public ValueTask<BaseResponseModel> Query(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds)
-        => DefaultRequest("query", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default)
+        => DefaultRequest("query", requestQuery, userspaceId, streamIds, cancellationToken);
 
     /// <inheritdoc />
     public ValueTask<BaseResponseModel> QueryRange(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds)
-        => DefaultRequest("query_range", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default)
+        => DefaultRequest("query_range", requestQuery, userspaceId, streamIds, cancellationToken);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> BuildInfo(IQueryCollection requestQuery)
-        => AllGrantedRequest("status/buildinfo", requestQuery);
+    public ValueTask<BaseResponseModel> BuildInfo(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default)
+        => AllGrantedRequest("status/buildinfo", requestQuery, cancellationToken);
 
     /// <inheritdoc />
     public ValueTask<BaseResponseModel> QueryExemplars(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds)
-        => DefaultRequest("query_exemplars", requestQuery, userspaceId, streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default)
+        => DefaultRequest("query_exemplars", requestQuery, userspaceId, streamIds, cancellationToken);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Metadata(IQueryCollection requestQuery)
-        => AllGrantedRequest("metadata", requestQuery);
+    public ValueTask<BaseResponseModel> Metadata(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default)
+        => AllGrantedRequest("metadata", requestQuery, cancellationToken);
 
     /// <inheritdoc />
-    public ValueTask<BaseResponseModel> Rules(IQueryCollection requestQuery)
-        => AllGrantedRequest("rules", requestQuery);
+    public ValueTask<BaseResponseModel> Rules(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default)
+        => AllGrantedRequest("rules", requestQuery, cancellationToken);
 
     /// <inheritdoc />
-    async ValueTask<BaseResponseModel> PostRequest(string requestUri, Dictionary<string, string> contentParams)
+    async ValueTask<BaseResponseModel> PostRequest(
+        string requestUri,
+        Dictionary<string, string> contentParams,
+        CancellationToken cancellationToken)
     {
         var content = new FormUrlEncodedContent(contentParams);
 
         HttpResponseMessage response;
         try
         {
-            response = await _httpClient.PostAsync(requestUri, content);
+            response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
         }
         catch (Exception e)
         {
@@ -112,7 +129,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
             };
         }
 
-        var responseContent = await response.Content.ReadAsStringAsync();
+        var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
         if (string.IsNullOrEmpty(responseContent))
         {
             return new BaseResponseModel
@@ -125,7 +142,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
         try
         {
             var responseMessage = await response.Content
-                .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel);
+                .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel, cancellationToken);
             if (responseMessage is null)
                 return new BaseResponseModel
                 {
@@ -145,9 +162,12 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
         }
     }
 
-    async ValueTask<BaseResponseModel> DefaultRequest(string requestUri, IQueryCollection requestQuery,
+    async ValueTask<BaseResponseModel> DefaultRequest(
+        string requestUri,
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds)
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken)
     {
         if (!streamIds.Any())
             throw new StorageException("There is no streamIds set.");
@@ -168,16 +188,19 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
             contentParams.Add(queryParam.Key, queryParam.Value.ToString());
         }
 
-        return await PostRequest(requestUri, contentParams);
+        return await PostRequest(requestUri, contentParams, cancellationToken);
     }
 
-    async ValueTask<BaseResponseModel> AllGrantedRequest(string requestUri, IQueryCollection requestQuery)
+    async ValueTask<BaseResponseModel> AllGrantedRequest(
+        string requestUri,
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken)
     {
         var contentParams = new Dictionary<string, string>();
 
         foreach (var queryParam in requestQuery)
             contentParams.Add(queryParam.Key, queryParam.Value.ToString());
 
-        return await PostRequest(requestUri, contentParams);
+        return await PostRequest(requestUri, contentParams, cancellationToken);
     }
 }

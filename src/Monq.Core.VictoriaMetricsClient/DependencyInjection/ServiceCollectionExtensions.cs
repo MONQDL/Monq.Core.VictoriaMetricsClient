@@ -4,6 +4,7 @@ using Monq.Core.VictoriaMetricsClient;
 using Monq.Core.VictoriaMetricsClient.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using System.Text;
 
 #pragma warning disable IDE0130
 namespace Microsoft.Extensions.DependencyInjection;
@@ -19,12 +20,14 @@ public static class ServiceCollectionExtensions
     /// <param name="configuration"></param>
     /// <returns></returns>
     [RequiresUnreferencedCode("Configuration binding requires unreferenced code")]
-    public static IServiceCollection AddVictoriaMetricsHttpClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddVictoriaMetricsHttpClient(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.Configure<VictoriaOptions>(configuration);
 
-        var readHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Read);
-        var writeHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Write);
+        var readHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Read, _ => { });
+        var writeHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Write, _ => { });
         services.AddHttpClient<IVictoriaClientRead, VictoriaClientRead>(readHttpClientConfiguration);
         services.AddHttpClient<IVictoriaProxyClient, VictoriaProxyClient>(readHttpClientConfiguration);
         services.AddHttpClient<IVictoriaClientWrite, VictoriaClientWrite>(writeHttpClientConfiguration);
@@ -32,11 +35,42 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    static Action<IServiceProvider, HttpClient> BuildConfiguration(ClusterNodeTypes clusterNodeType)
+    /// <summary>
+    /// Adds Victoria Metrics Http Client.
+    /// Use <see cref="IVictoriaClientRead"/> or <see cref="IVictoriaClientWrite"/> 
+    /// or <see cref="IVictoriaProxyClient"/> in services.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
+    /// <param name="configureHttpClient"></param>
+    /// <returns></returns>
+    [RequiresUnreferencedCode("Configuration binding requires unreferenced code")]
+    public static IServiceCollection AddVictoriaMetricsHttpClient(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Action<HttpClient> configureHttpClient)
+    {
+        services.Configure<VictoriaOptions>(configuration);
+
+        var readHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Read, configureHttpClient);
+        var writeHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Write, configureHttpClient);
+        services.AddHttpClient<IVictoriaClientRead, VictoriaClientRead>(readHttpClientConfiguration);
+        services.AddHttpClient<IVictoriaProxyClient, VictoriaProxyClient>(readHttpClientConfiguration);
+        services.AddHttpClient<IVictoriaClientWrite, VictoriaClientWrite>(writeHttpClientConfiguration);
+
+        return services;
+    }
+
+    static Action<IServiceProvider, HttpClient> BuildConfiguration(
+        ClusterNodeTypes clusterNodeType,
+        Action<HttpClient> configureHttpClient)
         => (provider, client) =>
         {
             var options = provider.GetRequiredService<IOptions<VictoriaOptions>>();
             var victoriaOptions = options.Value ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
+            
+            configureHttpClient(client);
+
             if (victoriaOptions.IsCluster)
                 client.ConfigureVictoriaMetricsAsCluster(victoriaOptions, clusterNodeType);
             else
@@ -98,8 +132,9 @@ public static class ServiceCollectionExtensions
         if (string.IsNullOrEmpty(options.BasicAuthPassword))
             throw new StorageConfigurationException("""You must specify the "basicAuthPassword" configuration property.""");
 
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(
-                System.Text.Encoding.UTF8.GetBytes($"{options.BasicAuthUsername}:{options.BasicAuthPassword}")));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Basic",
+            Convert.ToBase64String(Encoding.UTF8.GetBytes($"{options.BasicAuthUsername}:{options.BasicAuthPassword}")));
     }
 
     enum ClusterNodeTypes

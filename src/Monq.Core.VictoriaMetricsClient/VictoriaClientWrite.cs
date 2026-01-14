@@ -15,7 +15,9 @@ public class VictoriaClientWrite : IVictoriaClientWrite
     }
 
     /// <inheritdoc />
-    public async ValueTask Write(WriteRequest request)
+    public async ValueTask Write(
+        WriteRequest request,
+        CancellationToken cancellationToken = default)
     {
         var compressedMessage = IronSnappy.Snappy.Encode(request.ToByteArray());
 
@@ -25,7 +27,7 @@ public class VictoriaClientWrite : IVictoriaClientWrite
         HttpResponseMessage response;
         try
         {
-            response = await _httpClient.PostAsync("write", byteArrayContent);
+            response = await _httpClient.PostAsync("write", byteArrayContent, cancellationToken);
         }
         catch (Exception e)
         {
@@ -35,6 +37,6 @@ public class VictoriaClientWrite : IVictoriaClientWrite
         if (!response.IsSuccessStatusCode)
             throw new StorageException($"Storage. Victoria responded with status code: {(int)response.StatusCode}. " +
                 $"Can't store message due to exception. " +
-                $"Details: {await response.Content.ReadAsStringAsync()}");
+                $"Details: {await response.Content.ReadAsStringAsync(cancellationToken)}");
     }
 }

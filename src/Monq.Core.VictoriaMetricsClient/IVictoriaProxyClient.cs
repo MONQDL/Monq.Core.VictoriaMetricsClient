@@ -12,9 +12,11 @@ public interface IVictoriaProxyClient
     /// Execute a request to read the list of labels with forwarding query parameters.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Labels(
-        IQueryCollection requestQuery);
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Execute a request to read the list of labels with forwarding query parameters.
@@ -22,11 +24,13 @@ public interface IVictoriaProxyClient
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
     /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Labels(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Execute a request to read the label values with forwarding query parameters.
@@ -36,13 +40,15 @@ public interface IVictoriaProxyClient
     /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
     /// <param name="streamIds">List of thread IDs available to the user.</param>
     /// <param name="allowSkipExtraContent">Allow skip extra content with streamIds and userspaceId for label `__name__`.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> LabelValues(
         string label,
         IQueryCollection requestQuery,
         long userspaceId,
         IEnumerable<long> streamIds,
-        bool allowSkipExtraContent = true);
+        bool allowSkipExtraContent = true,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Finding series by label matchers.
@@ -50,11 +56,13 @@ public interface IVictoriaProxyClient
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
     /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Series(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Performs PromQL/MetricsQL instant query.
@@ -62,11 +70,13 @@ public interface IVictoriaProxyClient
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
     /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Query(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Performs PromQL/MetricsQL range query.
@@ -74,19 +84,23 @@ public interface IVictoriaProxyClient
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
     /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> QueryRange(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Performs PromQL/MetricsQL build_info query.
     /// </summary>
     /// <param name="requestQuery"></param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> BuildInfo(
-        IQueryCollection requestQuery);
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Performs PromQL/MetricsQL query exemplars.
@@ -94,25 +108,31 @@ public interface IVictoriaProxyClient
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
     /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> QueryExemplars(
         IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Performs PromQL/MetricsQL metadata query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Metadata(
-        IQueryCollection requestQuery);
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Performs PromQL/MetricsQL rules query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Rules(
-        IQueryCollection requestQuery);
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
 }
