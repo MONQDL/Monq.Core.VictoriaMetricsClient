@@ -9,7 +9,7 @@ namespace Monq.Core.VictoriaMetricsClient;
 public interface IVictoriaProxyClient
 {
     /// <summary>
-    /// Execute a request to read the list of labels with forwarding query parameters.
+    /// Run a query to read the list of labels with forwarding query parameters.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -19,11 +19,11 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Execute a request to read the list of labels with forwarding query parameters.
+    /// Run a query to read the list of labels with forwarding query parameters.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Labels(
@@ -33,13 +33,13 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Execute a request to read the label values with forwarding query parameters.
+    /// Run a query to read the label values with forwarding query parameters.
     /// </summary>
-    /// <param name="label"></param>
+    /// <param name="label">Label.</param>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
-    /// <param name="allowSkipExtraContent">Allow skip extra content with streamIds and userspaceId for label `__name__`.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
+    /// <param name="allowSkipExtraContent">Allow skipping extra content with streamIds and userspaceId for label `__name__`.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> LabelValues(
@@ -51,11 +51,11 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Finding series by label matchers.
+    /// Find series by label matchers.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Series(
@@ -68,8 +68,8 @@ public interface IVictoriaProxyClient
     /// Performs PromQL/MetricsQL instant query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> Query(
@@ -82,8 +82,8 @@ public interface IVictoriaProxyClient
     /// Performs PromQL/MetricsQL range query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> QueryRange(
@@ -95,7 +95,7 @@ public interface IVictoriaProxyClient
     /// <summary>
     /// Performs PromQL/MetricsQL build_info query.
     /// </summary>
-    /// <param name="requestQuery"></param>
+    /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> BuildInfo(
@@ -106,8 +106,8 @@ public interface IVictoriaProxyClient
     /// Performs PromQL/MetricsQL query exemplars.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     ValueTask<BaseResponseModel> QueryExemplars(

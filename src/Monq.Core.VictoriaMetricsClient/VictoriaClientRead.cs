@@ -20,7 +20,7 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         _httpClient = httpClient;
         _victoriaOptions =
             victoriaOptions?.Value
-            ?? throw new StorageConfigurationException("There is no configuration found for the VictoriaMetrics.");
+            ?? throw new StorageConfigurationException("There is no configuration found for VictoriaMetrics.");
     }
 
     /// <inheritdoc />
@@ -32,12 +32,12 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(query))
-            throw new StorageException($"The {nameof(query)} is null or empty.");
+            throw new StorageException($"{nameof(query)} is null or empty.");
 
         if (!streamIds.Any())
-            throw new StorageException("There is no streamIds set.");
+            throw new StorageException($"{nameof(streamIds)} is empty.");
         if (userspaceId <= 0)
-            throw new StorageException("The userspaceId parameter is not set.");
+            throw new StorageException($"{nameof(userspaceId)} must be greater than zero.");
 
         var contentParams = new Dictionary<string, string>
         {
@@ -60,12 +60,12 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrEmpty(query))
-            throw new StorageException($"The {nameof(query)} is null or empty.");
+            throw new StorageException($"{nameof(query)} is null or empty.");
 
         if (!streamIds.Any())
-            throw new StorageException("There is no streamIds set.");
+            throw new StorageException($"{nameof(streamIds)} is empty.");
         if (userspaceId <= 0)
-            throw new StorageException("The userspaceId parameter is not set.");
+            throw new StorageException($"{nameof(userspaceId)} must be greater than zero.");
 
         var contentParams = new Dictionary<string, string>
         {
@@ -93,20 +93,22 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         }
         catch (Exception e)
         {
-            throw new StorageException($"Storage throws exception on request. Details: {e.Message}", e);
+            throw new StorageException($"Storage threw exception on request. Details: {e.Message}", e);
         }
 
         if (!response.IsSuccessStatusCode)
-            throw new StorageException($"Storage. Victoria responded with status code: {(int)response.StatusCode}. " +
-                "Can't read message due to exception. " +
-                $"Details: {await response.Content.ReadAsStringAsync(cancellationToken)}");
+            throw new StorageException($"""
+                Storage responded with status code: {(int)response.StatusCode}.
+                Cannot read message due to an error.
+                Details: {await response.Content.ReadAsStringAsync(cancellationToken)}
+                """);
 
         var responseMessage = await response.Content
             .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel, cancellationToken)
             ?? throw new StorageException("Storage responded with empty message.");
-
         if (responseMessage.Status == PrometheusResponseStatuses.error)
             throw new StorageException($"Storage responded with status Error. Details: {responseMessage.Error}");
+       
         BaseQueryDataResponse? result;
         try
         {
@@ -115,7 +117,7 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         }
         catch (JsonException e)
         {
-            throw new StorageException($"""Storage "data" field can't be deserialized. Message: '{e.Message}'""", e);
+            throw new StorageException($"""Storage "data" field cannot be deserialized. Message: '{e.Message}'""", e);
         }
 
         if (result is null)

@@ -6,6 +6,7 @@ using Monq.Core.VictoriaMetricsClient.Extensions;
 using Monq.Core.VictoriaMetricsClient.Models;
 using Monq.Core.VictoriaMetricsClient.SerializerContexts;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
@@ -23,7 +24,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
         _httpClient = httpClient;
         _logger = logger;
         _victoriaOptions = victoriaOptions?.Value
-            ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
+            ?? throw new StorageConfigurationException("There is not configuration found for VictoriaMetrics.");
     }
 
     /// <inheritdoc />
@@ -120,7 +121,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
         }
         catch (Exception e)
         {
-            var message = $"Storage throws exception on request. Details: {e.Message}";
+            var message = $"Storage threw exception on request. Details: {e.Message}";
             _logger.LogError(e, message);
             return new BaseResponseModel
             {
@@ -152,7 +153,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
 
             return responseMessage;
         }
-        catch (System.Text.Json.JsonException)
+        catch (JsonException)
         {
             return new BaseResponseModel
             {
@@ -170,9 +171,9 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
         CancellationToken cancellationToken)
     {
         if (!streamIds.Any())
-            throw new StorageException("There is no streamIds set.");
+            throw new StorageException($"{nameof(streamIds)} is empty.");
         if (userspaceId <= 0)
-            throw new StorageException("The userspaceId parameter is not set.");
+            throw new StorageException($"{nameof(userspaceId)} must be greater than zero.");
 
         var contentParams = new Dictionary<string, string>()
         {

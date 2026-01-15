@@ -136,7 +136,7 @@ public class VictoriaProxyClientTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Labels(queryCollection.Object, 100, [])); // Empty list
 
-        Assert.Contains("no streamIds set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("streamIds is empty", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Labels] Проверка валидации отрицательного userspaceId")]
@@ -152,7 +152,7 @@ public class VictoriaProxyClientTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Labels(queryCollection.Object, -1, [1, 2, 3]));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Labels] Проверка валидации нулевого userspaceId")]
@@ -168,7 +168,7 @@ public class VictoriaProxyClientTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Labels(queryCollection.Object, 0, [1, 2, 3]));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[LabelValues] Вызов метода с label '__name__' и allowSkipExtraContent=true должен использовать AllGrantedRequest")]
@@ -524,7 +524,7 @@ public class VictoriaProxyClientTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(PrometheusResponseStatuses.error, result.Status);
-        Assert.Contains("Storage throws exception on request", result.Error, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Storage threw exception on request", result.Error, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[PostRequest] Пустой ответ от VictoriaMetrics должен возвращать BaseResponseModel с ошибкой")]

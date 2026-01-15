@@ -31,12 +31,14 @@ public class VictoriaClientWrite : IVictoriaClientWrite
         }
         catch (Exception e)
         {
-            throw new StorageException($"Storage. Can't store message due to exception. Details: {e.Message}", e);
+            throw new StorageException($"Storage threw exception on request. Details: {e.Message}", e);
         }
 
         if (!response.IsSuccessStatusCode)
-            throw new StorageException($"Storage. Victoria responded with status code: {(int)response.StatusCode}. " +
-                $"Can't store message due to exception. " +
-                $"Details: {await response.Content.ReadAsStringAsync(cancellationToken)}");
+            throw new StorageException($"""
+                Storage responded with status code: {(int)response.StatusCode}.
+                Cannot store message due to an error.
+                Details: {await response.Content.ReadAsStringAsync(cancellationToken)}
+                """);
     }
 }

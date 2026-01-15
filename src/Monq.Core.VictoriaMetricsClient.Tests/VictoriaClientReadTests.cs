@@ -116,7 +116,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
 
-        Assert.Contains("no streamIds set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("streamIds is empty", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Query] Проверка валидации отрицательного userspaceId")]
@@ -134,7 +134,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Query] Проверка валидации нулевого userspaceId")]
@@ -152,7 +152,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[QueryRange] Вызов метода с валидными параметрами должен возвращать успешный результат")]
@@ -249,7 +249,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
 
-        Assert.Contains("no streamIds set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("streamIds is empty", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[QueryRange] Проверка валидации отрицательного userspaceId")]
@@ -269,7 +269,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[QueryRange] Проверка валидации нулевого userspaceId")]
@@ -289,7 +289,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Query] Успешный ответ от VictoriaMetrics должен обрабатываться корректно")]
@@ -449,7 +449,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
 
-        Assert.Contains("Storage throws exception on request", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Storage threw exception on request", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.IsType<HttpRequestException>(exception.InnerException);
     }
 
@@ -565,7 +565,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
 
-        Assert.Contains($"""Storage "data" field can't be deserialized. Message:""", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains($"""Storage "data" field cannot be deserialized. Message:""", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Query] Неуспешный HTTP статус должен приводить к StorageException")]
@@ -595,7 +595,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.Query(query, step, streamIds, userspaceId));
 
-        Assert.Contains("Storage. Victoria responded with status code: 500", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Storage responded with status code: 500", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Internal Server Error", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -677,7 +677,7 @@ public class VictoriaClientReadTests
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
             await client.QueryRange(query, start, end, step, streamIds, userspaceId));
 
-        Assert.Contains("Storage throws exception on request", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("Storage threw exception on request", exception.Message, StringComparison.OrdinalIgnoreCase);
         Assert.IsType<HttpRequestException>(exception.InnerException);
     }
 
