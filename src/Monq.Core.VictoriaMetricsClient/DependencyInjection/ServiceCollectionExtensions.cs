@@ -68,7 +68,7 @@ public static class ServiceCollectionExtensions
         {
             var options = provider.GetRequiredService<IOptions<VictoriaOptions>>();
             var victoriaOptions = options.Value ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
-            
+
             configureHttpClient(client);
 
             if (victoriaOptions.IsCluster)

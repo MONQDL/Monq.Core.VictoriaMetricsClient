@@ -108,7 +108,7 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
             ?? throw new StorageException("Storage responded with empty message.");
         if (responseMessage.Status == PrometheusResponseStatuses.error)
             throw new StorageException($"Storage responded with status Error. Details: {responseMessage.Error}");
-       
+
         BaseQueryDataResponse? result;
         try
         {

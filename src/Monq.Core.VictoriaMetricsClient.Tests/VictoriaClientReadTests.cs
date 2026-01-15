@@ -87,7 +87,7 @@ public class VictoriaClientReadTests
     public async Task Query_WithNullQuery_ShouldThrowStorageException()
     {
         // Arrange
-        string query = null;
+        string? query = null;
         var step = "15s";
         var streamIds = new List<long> { 1, 2, 3 };
         var userspaceId = 100L;
@@ -216,7 +216,7 @@ public class VictoriaClientReadTests
     public async Task QueryRange_WithNullQuery_ShouldThrowStorageException()
     {
         // Arrange
-        string query = null;
+        string? query = null;
         var start = DateTimeOffset.UtcNow.AddDays(-1);
         var end = DateTimeOffset.UtcNow;
         var step = new TimeInterval(15, TimeIntervalUnits.Seconds);
