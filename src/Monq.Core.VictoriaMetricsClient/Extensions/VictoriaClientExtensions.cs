@@ -20,6 +20,7 @@ public static class VictoriaClientExtensions
     /// <param name="step">Time interval.</param>
     /// <param name="streamIds">Stream Ids.</param>
     /// <param name="userspaceId">Userspace Id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
     public static async Task<MatrixDataResult[]> QueryMatrixRange(
         this IVictoriaClientRead victoriaClient,
@@ -28,15 +29,48 @@ public static class VictoriaClientExtensions
         DateTimeOffset end,
         TimeInterval step,
         IEnumerable<long> streamIds,
-        long userspaceId)
+        long userspaceId,
+        CancellationToken cancellationToken = default)
     {
-        var queryDataResponse = await victoriaClient.QueryRange(query, start, end, step, streamIds, userspaceId);
+        var queryDataResponse = await victoriaClient.QueryRange(
+            query, start, end, step, streamIds, userspaceId, cancellationToken);
 
         if (queryDataResponse.ResultType != QueryResultTypes.matrix)
             throw new StorageException("""Query does not return "matrix" result.""");
 
         var dataResult = queryDataResponse.Result.Deserialize(
             MatrixDataResultSerializerContext.Default.MatrixDataResultArray)
+            ?? [];
+
+        return dataResult;
+    }
+
+    /// <summary>
+    /// Run a query to read metrics from the storage and get a result as vector.
+    /// </summary>
+    /// <param name="victoriaClient"><see cref="IVictoriaClientRead"/>.</param>
+    /// <param name="query">Query.</param>
+    /// <param name="step">Time interval.</param>
+    /// <param name="streamIds">Stream Ids.</param>
+    /// <param name="userspaceId">Userspace Id.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    public static async Task<VectorDataResult[]> QueryVector(
+        this IVictoriaClientRead victoriaClient,
+        string query,
+        string step,
+        IEnumerable<long> streamIds,
+        long userspaceId,
+        CancellationToken cancellationToken = default)
+    {
+        var queryDataResponse = await victoriaClient.Query(
+            query, step, streamIds, userspaceId, cancellationToken);
+
+        if (queryDataResponse.ResultType != QueryResultTypes.matrix)
+            throw new StorageException("""Query does not return "vector" result.""");
+
+        var dataResult = queryDataResponse.Result.Deserialize(
+            VectorDataResultSerializerContext.Default.VectorDataResultArray)
             ?? [];
 
         return dataResult;
