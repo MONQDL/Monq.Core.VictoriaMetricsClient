@@ -1,4 +1,4 @@
-﻿namespace Monq.Core.VictoriaMetricsClient;
+namespace Monq.Core.VictoriaMetricsClient;
 
 public static class VictoriaConstants
 {

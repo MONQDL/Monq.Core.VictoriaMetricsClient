@@ -1,5 +1,3 @@
-using System;
-using Xunit;
 using Monq.Core.VictoriaMetricsClient.Extensions;
 using Monq.Core.VictoriaMetricsClient.Models;
 

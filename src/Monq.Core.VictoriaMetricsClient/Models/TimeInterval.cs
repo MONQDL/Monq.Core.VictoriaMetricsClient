@@ -1,4 +1,4 @@
-﻿namespace Monq.Core.VictoriaMetricsClient.Models;
+namespace Monq.Core.VictoriaMetricsClient.Models;
 
 /// <summary>
 /// The representation of the time intervals in Prometheus. 
@@ -15,6 +15,9 @@ public class TimeInterval
     /// </summary>
     public TimeIntervalUnits Units { get; set; }
 
+    /// <summary>
+    /// Time interval constructor.
+    /// </summary>
     public TimeInterval(int value, TimeIntervalUnits units)
     {
         Value = value;

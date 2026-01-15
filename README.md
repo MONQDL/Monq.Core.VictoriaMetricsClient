@@ -1,3 +1,3 @@
 # Monq.Core.VictoriaMetricsClient
 
-VictoriaMetrics client for using into Monq with cluster support
+VictoriaMetrics client for using in Monq with cluster support.

@@ -1,6 +1,4 @@
-using System.Runtime.Serialization;
-
-namespace Monq.Core.VictoriaMetricsClient;
+namespace Monq.Core.VictoriaMetricsClient.Exceptions;
 
 /// <summary>
 /// The exeption is using in the VictoriaMetrics configuration methods.

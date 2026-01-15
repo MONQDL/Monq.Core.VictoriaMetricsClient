@@ -2,6 +2,9 @@ using Monq.Core.VictoriaMetricsClient.Models;
 
 namespace Monq.Core.VictoriaMetricsClient.Extensions;
 
+/// <summary>
+/// Time interval extension methods.
+/// </summary>
 public static class TimeIntervalExtensions
 {
     /// <summary>
@@ -11,15 +14,14 @@ public static class TimeIntervalExtensions
     /// <returns></returns>
     public static int ToSeconds(this TimeInterval timeInterval)
     {
-        int modifier;
-        switch (timeInterval.Units)
+        var modifier = timeInterval.Units switch
         {
-            case TimeIntervalUnits.Seconds: modifier = 1; break;
-            case TimeIntervalUnits.Minutes: modifier = 60; break;
-            case TimeIntervalUnits.Hours: modifier = 60 * 60; break;
-            case TimeIntervalUnits.Days: modifier = 60 * 60 * 24; break;
-            default: modifier = 1; break;
-        }
+            TimeIntervalUnits.Seconds => 1,
+            TimeIntervalUnits.Minutes => 60,
+            TimeIntervalUnits.Hours => 60 * 60,
+            TimeIntervalUnits.Days => 60 * 60 * 24,
+            _ => 1,
+        };
         return timeInterval.Value * modifier;
     }
 
@@ -31,16 +33,14 @@ public static class TimeIntervalExtensions
     /// <returns></returns>
     public static string ToPromQlInterval(this TimeInterval timeInterval)
     {
-        string promQlUnits;
-        switch (timeInterval.Units)
+        var promQlUnits = timeInterval.Units switch
         {
-            case TimeIntervalUnits.Seconds: promQlUnits = "s"; break;
-            case TimeIntervalUnits.Minutes: promQlUnits = "m"; break;
-            case TimeIntervalUnits.Hours: promQlUnits = "h"; break;
-            case TimeIntervalUnits.Days: promQlUnits = "d"; break;
-            default: promQlUnits = "m"; break;
-        }
-
+            TimeIntervalUnits.Seconds => "s",
+            TimeIntervalUnits.Minutes => "m",
+            TimeIntervalUnits.Hours => "h",
+            TimeIntervalUnits.Days => "d",
+            _ => "m",
+        };
         return $"{timeInterval.Value}{promQlUnits}";
     }
 }
