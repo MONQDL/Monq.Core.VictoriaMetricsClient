@@ -66,7 +66,7 @@ public static class VictoriaClientExtensions
         var queryDataResponse = await victoriaClient.Query(
             query, step, streamIds, userspaceId, cancellationToken);
 
-        if (queryDataResponse.ResultType != QueryResultTypes.matrix)
+        if (queryDataResponse.ResultType != QueryResultTypes.vector)
             throw new StorageException("""Query does not return "vector" result.""");
 
         var dataResult = queryDataResponse.Result.Deserialize(
