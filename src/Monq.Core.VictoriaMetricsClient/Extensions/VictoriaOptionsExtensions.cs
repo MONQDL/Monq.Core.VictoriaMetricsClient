@@ -5,7 +5,6 @@ namespace Monq.Core.VictoriaMetricsClient.Extensions;
 /// </summary>
 public static class VictoriaOptionsExtensions
 {
-
     /// <summary>
     /// Get userspace id label.
     /// </summary>
