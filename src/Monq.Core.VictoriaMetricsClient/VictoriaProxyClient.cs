@@ -10,12 +10,18 @@ using System.Text.Json;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
+/// <summary>
+/// Interface implementation for the client proxy requests to VictoriaMetrics with the addition of extra_labels.
+/// </summary>
 public sealed class VictoriaProxyClient : IVictoriaProxyClient
 {
     readonly HttpClient _httpClient;
     readonly ILogger<VictoriaProxyClient> _logger;
     readonly VictoriaOptions _victoriaOptions;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public VictoriaProxyClient(
         HttpClient httpClient,
         ILogger<VictoriaProxyClient> logger,
@@ -126,7 +132,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
             return new BaseResponseModel
             {
                 Error = message,
-                Status = PrometheusResponseStatuses.error
+                Status = PrometheusResponseStatuses.Error
             };
         }
 
@@ -136,7 +142,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
             return new BaseResponseModel
             {
                 Error = "Storage responded with empty message.",
-                Status = PrometheusResponseStatuses.error
+                Status = PrometheusResponseStatuses.Error
             };
         }
 
@@ -148,7 +154,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
                 return new BaseResponseModel
                 {
                     Error = "Storage responded with empty message.",
-                    Status = PrometheusResponseStatuses.error
+                    Status = PrometheusResponseStatuses.Error
                 };
 
             return responseMessage;
@@ -158,7 +164,7 @@ public sealed class VictoriaProxyClient : IVictoriaProxyClient
             return new BaseResponseModel
             {
                 Error = "Storage responded with invalid JSON.",
-                Status = PrometheusResponseStatuses.error
+                Status = PrometheusResponseStatuses.Error
             };
         }
     }

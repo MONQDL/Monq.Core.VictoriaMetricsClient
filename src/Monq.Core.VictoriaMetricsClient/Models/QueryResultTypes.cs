@@ -8,20 +8,20 @@ public enum QueryResultTypes
     /// <summary>
     /// Matrix.
     /// </summary>
-    matrix,
+    Matrix,
 
     /// <summary>
     /// Vector.
     /// </summary>
-    vector,
+    Vector,
 
     /// <summary>
     /// Scalar.
     /// </summary>
-    scalar,
+    Scalar,
 
     /// <summary>
     /// String.
     /// </summary>
-    @string
+    String
 }

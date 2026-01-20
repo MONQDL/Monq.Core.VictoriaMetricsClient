@@ -61,7 +61,7 @@ public class VictoriaClientReadTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(QueryResultTypes.matrix, result.ResultType);
+        Assert.Equal(QueryResultTypes.Matrix, result.ResultType);
         Assert.NotNull(result.Result);
     }
 
@@ -188,7 +188,7 @@ public class VictoriaClientReadTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(QueryResultTypes.matrix, result.ResultType);
+        Assert.Equal(QueryResultTypes.Matrix, result.ResultType);
         Assert.NotNull(result.Result);
     }
 
@@ -303,7 +303,7 @@ public class VictoriaClientReadTests
 
         var expectedResponse = new BaseResponseModel
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = JsonNode.Parse("""
             {
               "resultType": "matrix",
@@ -338,7 +338,7 @@ public class VictoriaClientReadTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(QueryResultTypes.matrix, result.ResultType);
+        Assert.Equal(QueryResultTypes.Matrix, result.ResultType);
         Assert.NotNull(result.Result);
         Assert.Single(result.Result);
 
@@ -365,7 +365,7 @@ public class VictoriaClientReadTests
 
         var expectedResponse = new BaseResponseModel
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = JsonNode.Parse("""
             {
               "resultType": "matrix",
@@ -400,7 +400,7 @@ public class VictoriaClientReadTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(QueryResultTypes.matrix, result.ResultType);
+        Assert.Equal(QueryResultTypes.Matrix, result.ResultType);
         Assert.NotNull(result.Result);
         Assert.Single(result.Result);
 
@@ -464,7 +464,7 @@ public class VictoriaClientReadTests
 
         var errorResponse = new BaseResponseModel
         {
-            Status = PrometheusResponseStatuses.error,
+            Status = PrometheusResponseStatuses.Error,
             Error = "Invalid query"
         };
 
@@ -503,7 +503,7 @@ public class VictoriaClientReadTests
 
         var emptyResponse = new BaseResponseModel
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = null // No data
         };
 
@@ -541,7 +541,7 @@ public class VictoriaClientReadTests
 
         var emptyDataResponse = new BaseResponseModel
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = JsonNode.Parse("{}") // Empty data object
         };
 
@@ -612,7 +612,7 @@ public class VictoriaClientReadTests
 
         var expectedResponse = new BaseResponseModel
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = JsonNode.Parse("""
             {
               "resultType": "matrix",
@@ -647,7 +647,7 @@ public class VictoriaClientReadTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(QueryResultTypes.matrix, result.ResultType);
+        Assert.Equal(QueryResultTypes.Matrix, result.ResultType);
         Assert.NotNull(result.Result);
         Assert.Single(result.Result);
     }
@@ -694,7 +694,7 @@ public class VictoriaClientReadTests
 
         var errorResponse = new BaseResponseModel
         {
-            Status = PrometheusResponseStatuses.error,
+            Status = PrometheusResponseStatuses.Error,
             Error = "Invalid query"
         };
 
@@ -725,7 +725,7 @@ public class VictoriaClientReadTests
     static BaseResponseModel CreateSuccessResponse()
         => new()
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = JsonNode.Parse("""
                 {
                   "resultType": "matrix",

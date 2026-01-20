@@ -2,6 +2,9 @@ using Monq.Core.VictoriaMetricsClient.Models;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
+/// <summary>
+/// VictoriaClient read operations interface.
+/// </summary>
 public interface IVictoriaClientRead
 {
     /// <summary>

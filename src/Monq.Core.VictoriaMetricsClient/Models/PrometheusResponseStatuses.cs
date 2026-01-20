@@ -8,10 +8,10 @@ public enum PrometheusResponseStatuses
     /// <summary>
     /// Success.
     /// </summary>
-    success,
+    Success,
 
     /// <summary>
     /// Error.
     /// </summary>
-    error
+    Error
 }

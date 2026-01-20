@@ -4,7 +4,7 @@ using Monq.Core.VictoriaMetricsClient.Models;
 namespace Monq.Core.VictoriaMetricsClient;
 
 /// <summary>
-/// The client proxies requests to VictoriaMetrics with the addition of extra_labels.
+/// Interface for the client proxy requests to VictoriaMetrics with the addition of extra_labels.
 /// </summary>
 public interface IVictoriaProxyClient
 {
@@ -65,7 +65,7 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL instant query.
+    /// Perform PromQL/MetricsQL instant query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
@@ -79,7 +79,7 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL range query.
+    /// Perform PromQL/MetricsQL range query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
@@ -93,7 +93,7 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL build_info query.
+    /// Perform PromQL/MetricsQL build_info query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -103,7 +103,7 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL query exemplars.
+    /// Perform PromQL/MetricsQL query exemplars.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
@@ -117,7 +117,7 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL metadata query.
+    /// Perform PromQL/MetricsQL metadata query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
@@ -127,7 +127,7 @@ public interface IVictoriaProxyClient
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL rules query.
+    /// Perform PromQL/MetricsQL rules query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
     /// <param name="cancellationToken">Cancellation token.</param>

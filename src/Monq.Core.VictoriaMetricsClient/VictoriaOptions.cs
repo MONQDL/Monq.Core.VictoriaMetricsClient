@@ -1,18 +1,18 @@
 namespace Monq.Core.VictoriaMetricsClient;
 
 /// <summary>
-/// The VictoriaMetrics client connection options.
+/// VictoriaMetrics client connection options.
 /// </summary>
 public class VictoriaOptions
 {
     /// <summary>
-    /// The VictoriaMetrics instance URI. This property will be used if <see cref="IsCluster"/> is false.
+    /// VictoriaMetrics instance URI. This property will be used if <see cref="IsCluster"/> is false.
     /// </summary>
     public string? Uri { get; set; }
 
     /// <summary>
-    /// If true - than you must specify the <see cref="ClusterSelectUri"/> and <see cref="ClusterInsertUri"/> properties.
-    /// If false - than you must specify the <see cref="Uri"/> property.
+    /// If true - then you must specify the <see cref="ClusterSelectUri"/> and <see cref="ClusterInsertUri"/> properties.
+    /// If false - then you must specify the <see cref="Uri"/> property.
     /// </summary>
     public bool IsCluster { get; set; } = false;
 
@@ -41,19 +41,19 @@ public class VictoriaOptions
     public AuthenticationTypes AuthenticationType { get; set; } = AuthenticationTypes.BasicAuth;
 
     /// <summary>
-    /// The username of the BasicAuth authentication mechanism.
+    /// The username of BasicAuth authentication mechanism.
     /// This property will be used if <see cref="AuthenticationType"/> is <see cref="AuthenticationTypes.BasicAuth"/>.
     /// </summary>
     public string? BasicAuthUsername { get; set; }
 
     /// <summary>
-    /// The password of the BasicAuth authentication mechanism.
+    /// The password of BasicAuth authentication mechanism.
     /// This property will be used if <see cref="AuthenticationType"/> is <see cref="AuthenticationTypes.BasicAuth"/>.
     /// </summary>
     public string? BasicAuthPassword { get; set; }
 
     /// <summary>
-    /// If true, than use the http v2 connection protocol.
+    /// If true, then use the http v2 connection protocol.
     /// </summary>
     public bool UseHttpV2 { get; set; } = true;
 

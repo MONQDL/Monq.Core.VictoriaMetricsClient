@@ -86,7 +86,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -119,7 +119,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -200,7 +200,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -233,7 +233,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -266,7 +266,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -299,7 +299,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -332,7 +332,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -365,7 +365,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -398,7 +398,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -431,7 +431,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -464,7 +464,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -497,7 +497,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -523,7 +523,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.error, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Error, result.Status);
         Assert.Contains("Storage threw exception on request", result.Error, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -553,7 +553,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.error, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Error, result.Status);
         Assert.Contains("Storage responded with empty message", result.Error, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -590,7 +590,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
     }
 
     [Fact(DisplayName = "[DefaultRequest] Проверка защиты от внедрения параметров extra_label и extra_filters[]")]
@@ -628,7 +628,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
     }
 
     [Fact(DisplayName = "[AllGrantedRequest] Вызов метода должен использовать все параметры из IQueryCollection")]
@@ -665,13 +665,13 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
     }
 
     static BaseResponseModel CreateSuccessResponse()
         => new()
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = JsonNode.Parse("""
                 {
                   "resultType": "matrix",

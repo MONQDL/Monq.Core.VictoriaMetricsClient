@@ -1,18 +1,21 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Monq.Core.VictoriaMetricsClient;
 using Monq.Core.VictoriaMetricsClient.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 
 #pragma warning disable IDE0130
-namespace Microsoft.Extensions.DependencyInjection;
+namespace Monq.Core.VictoriaMetricsClient;
 
+/// <summary>
+/// <see cref="ServiceCollection"/> extension methods.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds Victoria Metrics Http Client.
+    /// Add VictoriaMetrics HTTP client.
     /// Use <see cref="IVictoriaClientRead"/> or <see cref="IVictoriaClientWrite"/> 
     /// or <see cref="IVictoriaProxyClient"/> in services.
     /// </summary>
@@ -36,7 +39,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Adds Victoria Metrics Http Client.
+    /// Add VictoriaMetrics HTTP client.
     /// Use <see cref="IVictoriaClientRead"/> or <see cref="IVictoriaClientWrite"/> 
     /// or <see cref="IVictoriaProxyClient"/> in services.
     /// </summary>
@@ -67,7 +70,7 @@ public static class ServiceCollectionExtensions
         => (provider, client) =>
         {
             var options = provider.GetRequiredService<IOptions<VictoriaOptions>>();
-            var victoriaOptions = options.Value ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
+            var victoriaOptions = options.Value ?? throw new StorageConfigurationException("Configuration for VictoriaMetrics is not defined.");
 
             configureHttpClient(client);
 
@@ -92,9 +95,9 @@ public static class ServiceCollectionExtensions
     static void ConfigureVictoriaMetricsAsCluster(this HttpClient client, VictoriaOptions options, ClusterNodeTypes clusterNodeType)
     {
         if (string.IsNullOrEmpty(options.ClusterInsertUri))
-            throw new StorageConfigurationException("""You must specify the "clusterInsertUri" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.ClusterInsertUri)} configuration property.");
         if (string.IsNullOrEmpty(options.ClusterSelectUri))
-            throw new StorageConfigurationException("""You must specify the "clusterSelectUri" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.ClusterSelectUri)} configuration property.");
 
         const string multitenant = "multitenant";
         string? accountId;
@@ -120,7 +123,7 @@ public static class ServiceCollectionExtensions
     static void ConfigureVictoriaMetricsAsSingle(this HttpClient client, VictoriaOptions options)
     {
         if (string.IsNullOrEmpty(options.Uri))
-            throw new StorageConfigurationException("""You must specify the "uri" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.Uri)} configuration property.");
 
         client.BaseAddress = new Uri(new Uri(options.Uri), "prometheus/api/v1/");
     }
@@ -128,9 +131,9 @@ public static class ServiceCollectionExtensions
     static void ConfigureVictoriaMetricsWithBasicAuth(this HttpClient client, VictoriaOptions options)
     {
         if (string.IsNullOrEmpty(options.BasicAuthUsername))
-            throw new StorageConfigurationException("""You must specify the "basicAuthUsername" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.BasicAuthUsername)} configuration property.");
         if (string.IsNullOrEmpty(options.BasicAuthPassword))
-            throw new StorageConfigurationException("""You must specify the "basicAuthPassword" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.BasicAuthPassword)} configuration property.");
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Basic",

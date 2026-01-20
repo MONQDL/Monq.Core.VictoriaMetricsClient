@@ -8,11 +8,17 @@ using System.Text.Json;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
+/// <summary>
+/// VictoriaClient read operations interface implementation.
+/// </summary>
 public sealed class VictoriaClientRead : IVictoriaClientRead
 {
     readonly HttpClient _httpClient;
     readonly VictoriaOptions _victoriaOptions;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public VictoriaClientRead(
         HttpClient httpClient,
         IOptions<VictoriaOptions> victoriaOptions)
@@ -106,7 +112,7 @@ public sealed class VictoriaClientRead : IVictoriaClientRead
         var responseMessage = await response.Content
             .ReadFromJsonAsync(BaseResponseModelSerializerContext.Default.BaseResponseModel, cancellationToken)
             ?? throw new StorageException("Storage responded with empty message.");
-        if (responseMessage.Status == PrometheusResponseStatuses.error)
+        if (responseMessage.Status == PrometheusResponseStatuses.Error)
             throw new StorageException($"Storage responded with status Error. Details: {responseMessage.Error}");
 
         BaseQueryDataResponse? result;

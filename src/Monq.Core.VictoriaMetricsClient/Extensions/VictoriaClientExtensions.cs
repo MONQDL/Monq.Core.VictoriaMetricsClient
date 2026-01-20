@@ -22,7 +22,7 @@ public static class VictoriaClientExtensions
     /// <param name="userspaceId">Userspace Id.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    public static async Task<MatrixDataResult[]> QueryMatrixRange(
+    public static async ValueTask<MatrixDataResult[]> QueryMatrixRange(
         this IVictoriaClientRead victoriaClient,
         string query,
         DateTimeOffset start,
@@ -35,7 +35,7 @@ public static class VictoriaClientExtensions
         var queryDataResponse = await victoriaClient.QueryRange(
             query, start, end, step, streamIds, userspaceId, cancellationToken);
 
-        if (queryDataResponse.ResultType != QueryResultTypes.matrix)
+        if (queryDataResponse.ResultType != QueryResultTypes.Matrix)
             throw new StorageException("""Query does not return "matrix" result.""");
 
         var dataResult = queryDataResponse.Result.Deserialize(
@@ -55,7 +55,7 @@ public static class VictoriaClientExtensions
     /// <param name="userspaceId">Userspace Id.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    public static async Task<VectorDataResult[]> QueryVector(
+    public static async ValueTask<VectorDataResult[]> QueryVector(
         this IVictoriaClientRead victoriaClient,
         string query,
         string step,
@@ -66,7 +66,7 @@ public static class VictoriaClientExtensions
         var queryDataResponse = await victoriaClient.Query(
             query, step, streamIds, userspaceId, cancellationToken);
 
-        if (queryDataResponse.ResultType != QueryResultTypes.vector)
+        if (queryDataResponse.ResultType != QueryResultTypes.Vector)
             throw new StorageException("""Query does not return "vector" result.""");
 
         var dataResult = queryDataResponse.Result.Deserialize(

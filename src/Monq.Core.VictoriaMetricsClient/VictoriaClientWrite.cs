@@ -5,10 +5,16 @@ using System.Net.Http.Headers;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
-public class VictoriaClientWrite : IVictoriaClientWrite
+/// <summary>
+/// VictoriaClient write operations interface implementation.
+/// </summary>
+public sealed class VictoriaClientWrite : IVictoriaClientWrite
 {
     readonly HttpClient _httpClient;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public VictoriaClientWrite(HttpClient httpClient)
     {
         _httpClient = httpClient;
