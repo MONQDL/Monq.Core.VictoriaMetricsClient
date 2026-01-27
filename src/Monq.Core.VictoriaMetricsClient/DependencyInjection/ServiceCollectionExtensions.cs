@@ -74,6 +74,9 @@ public static class ServiceCollectionExtensions
 
             configureHttpClient(client);
 
+            if (victoriaOptions.HttpTimeout.HasValue)
+                client.Timeout = victoriaOptions.HttpTimeout.Value;
+
             if (victoriaOptions.IsCluster)
                 client.ConfigureVictoriaMetricsAsCluster(victoriaOptions, clusterNodeType);
             else

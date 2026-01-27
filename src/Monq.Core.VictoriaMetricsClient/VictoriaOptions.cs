@@ -61,6 +61,12 @@ public class VictoriaOptions
     /// Prefix for system labels.
     /// </summary>
     public string SystemLabelPrefix { get; set; } = "monq_";
+
+    /// <summary>
+    /// Timeout for underlying HTTP requests.
+    /// </summary>
+    /// <value>Default <see cref="HttpClient.Timeout"/> is used, if value is null.</value>
+    public TimeSpan? HttpTimeout { get; set; }
 }
 
 /// <summary>
