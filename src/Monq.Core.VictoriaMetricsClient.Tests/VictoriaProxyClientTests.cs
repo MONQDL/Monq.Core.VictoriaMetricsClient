@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
 using Monq.Core.VictoriaMetricsClient.Models;
 using Monq.Core.VictoriaMetricsClient.SerializerContexts;
 using Moq;
@@ -14,11 +16,11 @@ namespace Monq.Core.VictoriaMetricsClient.Tests;
 
 public class VictoriaProxyClientTests
 {
-    private readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
-    private readonly HttpClient _httpClient;
-    private readonly VictoriaOptions _victoriaOptions;
-    private readonly Mock<IOptions<VictoriaOptions>> _optionsMock;
-    private readonly Mock<ILogger<VictoriaProxyClient>> _loggerMock;
+    readonly Mock<HttpMessageHandler> _httpMessageHandlerMock;
+    readonly HttpClient _httpClient;
+    readonly VictoriaOptions _victoriaOptions;
+    readonly Mock<IOptions<VictoriaOptions>> _optionsMock;
+    readonly Mock<ILogger<VictoriaProxyClient>> _loggerMock;
 
     public VictoriaProxyClientTests()
     {
@@ -48,7 +50,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var nullOptionsMock = new Mock<IOptions<VictoriaOptions>>();
-        nullOptionsMock.Setup(x => x.Value).Returns((VictoriaOptions)null);
+        nullOptionsMock.Setup(x => x.Value).Returns((VictoriaOptions)null!);
 
         // Act & Assert
         Assert.Throws<StorageConfigurationException>(() =>
@@ -60,7 +62,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -84,7 +86,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -93,7 +95,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -113,11 +115,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.Labels(queryCollection.Object, 100, new List<long> { 1, 2, 3 });
+        var result = await client.Labels(queryCollection.Object, 100, [1, 2, 3]);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -126,15 +128,15 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
-            await client.Labels(queryCollection.Object, 100, new List<long>())); // Empty list
+            await client.Labels(queryCollection.Object, 100, [])); // Empty list
 
-        Assert.Contains("no streamIds set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("streamIds is empty", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Labels] Проверка валидации отрицательного userspaceId")]
@@ -142,15 +144,15 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
-            await client.Labels(queryCollection.Object, -1, new List<long> { 1, 2, 3 }));
+            await client.Labels(queryCollection.Object, -1, [1, 2, 3]));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[Labels] Проверка валидации нулевого userspaceId")]
@@ -158,15 +160,15 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<StorageException>(async () =>
-            await client.Labels(queryCollection.Object, 0, new List<long> { 1, 2, 3 }));
+            await client.Labels(queryCollection.Object, 0, [1, 2, 3]));
 
-        Assert.Contains("userspaceId parameter is not set", exception.Message, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("userspaceId must be greater than zero", exception.Message, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[LabelValues] Вызов метода с label '__name__' и allowSkipExtraContent=true должен использовать AllGrantedRequest")]
@@ -174,7 +176,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -194,11 +196,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.LabelValues("__name__", queryCollection.Object, 100, new List<long> { 1, 2, 3 }, true);
+        var result = await client.LabelValues("__name__", queryCollection.Object, 100, [1, 2, 3], true);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -207,7 +209,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -227,11 +229,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.LabelValues("__name__", queryCollection.Object, 100, new List<long> { 1, 2, 3 }, false);
+        var result = await client.LabelValues("__name__", queryCollection.Object, 100, [1, 2, 3], false);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -240,7 +242,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -260,11 +262,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.LabelValues("test_label", queryCollection.Object, 100, new List<long> { 1, 2, 3 }, true);
+        var result = await client.LabelValues("test_label", queryCollection.Object, 100, [1, 2, 3], true);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -273,7 +275,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -293,11 +295,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.Series(queryCollection.Object, 100, new List<long> { 1, 2, 3 });
+        var result = await client.Series(queryCollection.Object, 100, [1, 2, 3]);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -306,7 +308,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -326,11 +328,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.Query(queryCollection.Object, 100, new List<long> { 1, 2, 3 });
+        var result = await client.Query(queryCollection.Object, 100, [1, 2, 3]);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -339,7 +341,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -359,11 +361,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.QueryRange(queryCollection.Object, 100, new List<long> { 1, 2, 3 });
+        var result = await client.QueryRange(queryCollection.Object, 100, [1, 2, 3]);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -372,7 +374,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -396,7 +398,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -405,7 +407,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -425,11 +427,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.QueryExemplars(queryCollection.Object, 100, new List<long> { 1, 2, 3 });
+        var result = await client.QueryExemplars(queryCollection.Object, 100, [1, 2, 3]);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -438,7 +440,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -462,7 +464,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -471,7 +473,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         var expectedResponse = CreateSuccessResponse();
         var jsonContent = JsonSerializer.Serialize(expectedResponse, BaseResponseModelSerializerContext.Default.BaseResponseModel);
@@ -495,7 +497,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
         Assert.NotNull(result.Data);
     }
 
@@ -504,7 +506,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         _httpMessageHandlerMock
             .Protected()
@@ -521,8 +523,8 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.error, result.Status);
-        Assert.Contains("Storage throws exception on request", result.Error, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(PrometheusResponseStatuses.Error, result.Status);
+        Assert.Contains("Storage threw exception on request", result.Error, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact(DisplayName = "[PostRequest] Пустой ответ от VictoriaMetrics должен возвращать BaseResponseModel с ошибкой")]
@@ -530,7 +532,7 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>().GetEnumerator());
+        queryCollection.Setup(x => x.GetEnumerator()).Returns(new List<KeyValuePair<string, StringValues>>().GetEnumerator());
 
         _httpMessageHandlerMock
             .Protected()
@@ -551,7 +553,7 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.error, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Error, result.Status);
         Assert.Contains("Storage responded with empty message", result.Error, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -560,9 +562,9 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        var queryParams = new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>
+        var queryParams = new List<KeyValuePair<string, StringValues>>
         {
-            new KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>("query", "up")
+            new("query", "up")
         };
         queryCollection.Setup(x => x.GetEnumerator()).Returns(queryParams.GetEnumerator());
 
@@ -584,11 +586,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.Labels(queryCollection.Object, 100, new List<long> { 1, 2, 3 });
+        var result = await client.Labels(queryCollection.Object, 100, [1, 2, 3]);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
     }
 
     [Fact(DisplayName = "[DefaultRequest] Проверка защиты от внедрения параметров extra_label и extra_filters[]")]
@@ -596,11 +598,11 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        var queryParams = new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>
+        var queryParams = new List<KeyValuePair<string, StringValues>>
         {
-            new KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>("extra_label", "user_value"),
-            new KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>("extra_filters[]", "user_filter"),
-            new KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>("valid_param", "valid_value")
+            new("extra_label", "user_value"),
+            new("extra_filters[]", "user_filter"),
+            new("valid_param", "valid_value")
         };
         queryCollection.Setup(x => x.GetEnumerator()).Returns(queryParams.GetEnumerator());
 
@@ -622,11 +624,11 @@ public class VictoriaProxyClientTests
         var client = new VictoriaProxyClient(_httpClient, _loggerMock.Object, _optionsMock.Object);
 
         // Act
-        var result = await client.Labels(queryCollection.Object, 100, new List<long> { 1, 2, 3 });
+        var result = await client.Labels(queryCollection.Object, 100, [1, 2, 3]);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
     }
 
     [Fact(DisplayName = "[AllGrantedRequest] Вызов метода должен использовать все параметры из IQueryCollection")]
@@ -634,10 +636,10 @@ public class VictoriaProxyClientTests
     {
         // Arrange
         var queryCollection = new Mock<IQueryCollection>();
-        var queryParams = new List<KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>>
+        var queryParams = new List<KeyValuePair<string, StringValues>>
         {
-            new KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>("param1", "value1"),
-            new KeyValuePair<string, Microsoft.Extensions.Primitives.StringValues>("param2", "value2")
+            new("param1", "value1"),
+            new("param2", "value2")
         };
         queryCollection.Setup(x => x.GetEnumerator()).Returns(queryParams.GetEnumerator());
 
@@ -663,25 +665,23 @@ public class VictoriaProxyClientTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(PrometheusResponseStatuses.success, result.Status);
+        Assert.Equal(PrometheusResponseStatuses.Success, result.Status);
     }
 
-    private BaseResponseModel CreateSuccessResponse()
-    {
-        return new BaseResponseModel
+    static BaseResponseModel CreateSuccessResponse()
+        => new()
         {
-            Status = PrometheusResponseStatuses.success,
+            Status = PrometheusResponseStatuses.Success,
             Data = JsonNode.Parse("""
-            {
-              "resultType": "matrix",
-              "result": [
                 {
-                  "metric": { "__name__": "up", "job": "prometheus" },
-                  "values": [[1565133785.061, "1"], [1565133845.061, "1"]]
+                  "resultType": "matrix",
+                  "result": [
+                    {
+                      "metric": { "__name__": "up", "job": "prometheus" },
+                      "values": [[1565133785.061, "1"], [1565133845.061, "1"]]
+                    }
+                  ]
                 }
-              ]
-            }
-            """)
+                """)
         };
-    }
 }

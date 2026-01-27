@@ -4,103 +4,135 @@ using Monq.Core.VictoriaMetricsClient.Models;
 namespace Monq.Core.VictoriaMetricsClient;
 
 /// <summary>
-/// The client proxies requests to VictoriaMetrics with the addition of extra_labels.
+/// Interface for the client proxy requests to VictoriaMetrics with the addition of extra_labels.
 /// </summary>
 public interface IVictoriaProxyClient
 {
     /// <summary>
-    /// Execute a request to read the list of labels with forwarding query parameters.
+    /// Run a query to read the list of labels with forwarding query parameters.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery);
+    ValueTask<BaseResponseModel> Labels(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Execute a request to read the list of labels with forwarding query parameters.
+    /// Run a query to read the list of labels with forwarding query parameters.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> Labels(IQueryCollection requestQuery, long userspaceId, IEnumerable<long> streamIds);
-
-    /// <summary>
-    /// Execute a request to read the label values with forwarding query parameters.
-    /// </summary>
-    /// <param name="label"></param>
-    /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
-    /// <param name="allowSkipExtraContent">Allow skip extra content with streamIds and userspaceId for label `__name__`.</param>
-    /// <returns></returns>
-    ValueTask<BaseResponseModel> LabelValues(string label,
+    ValueTask<BaseResponseModel> Labels(
         IQueryCollection requestQuery,
         long userspaceId,
         IEnumerable<long> streamIds,
-        bool allowSkipExtraContent = true);
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Finding series by label matchers.
+    /// Run a query to read the label values with forwarding query parameters.
     /// </summary>
+    /// <param name="label">Label.</param>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
+    /// <param name="allowSkipExtraContent">Allow skipping extra content with streamIds and userspaceId for label `__name__`.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> Series(IQueryCollection requestQuery,
+    ValueTask<BaseResponseModel> LabelValues(
+        string label,
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        bool allowSkipExtraContent = true,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL instant query.
+    /// Find series by label matchers.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> Query(IQueryCollection requestQuery,
+    ValueTask<BaseResponseModel> Series(
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL range query.
+    /// Perform PromQL/MetricsQL instant query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> QueryRange(IQueryCollection requestQuery,
+    ValueTask<BaseResponseModel> Query(
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL build_info query.
-    /// </summary>
-    /// <param name="requestQuery"></param>
-    /// <returns></returns>
-    ValueTask<BaseResponseModel> BuildInfo(IQueryCollection requestQuery);
-
-    /// <summary>
-    /// Performs PromQL/MetricsQL query exemplars.
+    /// Perform PromQL/MetricsQL range query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
-    /// <param name="userspaceId">The id of the user space within which the request will be executed.</param>
-    /// <param name="streamIds">List of thread IDs available to the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> QueryExemplars(IQueryCollection requestQuery,
+    ValueTask<BaseResponseModel> QueryRange(
+        IQueryCollection requestQuery,
         long userspaceId,
-        IEnumerable<long> streamIds);
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL metadata query.
+    /// Perform PromQL/MetricsQL build_info query.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> Metadata(IQueryCollection requestQuery);
+    ValueTask<BaseResponseModel> BuildInfo(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Performs PromQL/MetricsQL rules query.
+    /// Perform PromQL/MetricsQL query exemplars.
     /// </summary>
     /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="userspaceId">The id of the userspace within which the request will be executed.</param>
+    /// <param name="streamIds">List of stream Ids available to the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns></returns>
-    ValueTask<BaseResponseModel> Rules(IQueryCollection requestQuery);
+    ValueTask<BaseResponseModel> QueryExemplars(
+        IQueryCollection requestQuery,
+        long userspaceId,
+        IEnumerable<long> streamIds,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Perform PromQL/MetricsQL metadata query.
+    /// </summary>
+    /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    ValueTask<BaseResponseModel> Metadata(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Perform PromQL/MetricsQL rules query.
+    /// </summary>
+    /// <param name="requestQuery">Query parameters set by the user.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns></returns>
+    ValueTask<BaseResponseModel> Rules(
+        IQueryCollection requestQuery,
+        CancellationToken cancellationToken = default);
 }

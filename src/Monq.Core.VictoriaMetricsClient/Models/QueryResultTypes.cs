@@ -1,9 +1,27 @@
-﻿namespace Monq.Core.VictoriaMetricsClient.Models;
+namespace Monq.Core.VictoriaMetricsClient.Models;
 
+/// <summary>
+/// Query result type.
+/// </summary>
 public enum QueryResultTypes
 {
-    matrix,
-    vector,
-    scalar,
-    @string
+    /// <summary>
+    /// Matrix.
+    /// </summary>
+    Matrix,
+
+    /// <summary>
+    /// Vector.
+    /// </summary>
+    Vector,
+
+    /// <summary>
+    /// Scalar.
+    /// </summary>
+    Scalar,
+
+    /// <summary>
+    /// String.
+    /// </summary>
+    String
 }

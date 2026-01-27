@@ -3,10 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace Monq.Core.VictoriaMetricsClient.SerializerContexts;
 
-[JsonSerializable(typeof(BaseResponseModel))]
-[JsonSourceGenerationOptions(UseStringEnumConverter = true,
-    PropertyNamingPolicy =  JsonKnownNamingPolicy.CamelCase,
+/// <summary>
+/// <see cref="Models.BaseResponseModel"/> serializer context.
+/// </summary>
+[JsonSourceGenerationOptions(
+    UseStringEnumConverter = true,
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     NumberHandling = JsonNumberHandling.AllowReadingFromString)]
-internal partial class BaseResponseModelSerializerContext : JsonSerializerContext
+[JsonSerializable(typeof(BaseResponseModel))]
+public sealed partial class BaseResponseModelSerializerContext : JsonSerializerContext
 {
 }

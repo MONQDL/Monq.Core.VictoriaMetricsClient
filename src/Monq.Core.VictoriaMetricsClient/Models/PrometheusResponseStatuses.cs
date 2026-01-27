@@ -1,7 +1,17 @@
-﻿namespace Monq.Core.VictoriaMetricsClient.Models;
+namespace Monq.Core.VictoriaMetricsClient.Models;
 
+/// <summary>
+/// Response status.
+/// </summary>
 public enum PrometheusResponseStatuses
 {
-    success,
-    error
+    /// <summary>
+    /// Success.
+    /// </summary>
+    Success,
+
+    /// <summary>
+    /// Error.
+    /// </summary>
+    Error
 }

@@ -1,20 +1,29 @@
 using Google.Protobuf;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
 using PrometheusGrpc;
 using System.Net.Http.Headers;
 
 namespace Monq.Core.VictoriaMetricsClient;
 
-public class VictoriaClientWrite : IVictoriaClientWrite
+/// <summary>
+/// VictoriaClient write operations interface implementation.
+/// </summary>
+public sealed class VictoriaClientWrite : IVictoriaClientWrite
 {
     readonly HttpClient _httpClient;
 
+    /// <summary>
+    /// Constructor.
+    /// </summary>
     public VictoriaClientWrite(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
 
     /// <inheritdoc />
-    public async ValueTask Write(WriteRequest request)
+    public async ValueTask Write(
+        WriteRequest request,
+        CancellationToken cancellationToken = default)
     {
         var compressedMessage = IronSnappy.Snappy.Encode(request.ToByteArray());
 
@@ -24,16 +33,18 @@ public class VictoriaClientWrite : IVictoriaClientWrite
         HttpResponseMessage response;
         try
         {
-            response = await _httpClient.PostAsync("write", byteArrayContent);
+            response = await _httpClient.PostAsync("write", byteArrayContent, cancellationToken);
         }
         catch (Exception e)
         {
-            throw new StorageException($"Storage. Can't store message due to exception. Details: {e.Message}", e);
+            throw new StorageException($"Storage threw exception on request. Details: {e.Message}", e);
         }
 
         if (!response.IsSuccessStatusCode)
-            throw new StorageException($"Storage. Victoria responded with status code: {(int)response.StatusCode}. " +
-                $"Can't store message due to exception. " +
-                $"Details: {await response.Content.ReadAsStringAsync()}");
+            throw new StorageException($"""
+                Storage responded with status code: {(int)response.StatusCode}.
+                Cannot store message due to an error.
+                Details: {await response.Content.ReadAsStringAsync(cancellationToken)}
+                """);
     }
 }

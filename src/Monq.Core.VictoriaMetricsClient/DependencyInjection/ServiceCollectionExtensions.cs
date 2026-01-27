@@ -1,15 +1,21 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Monq.Core.VictoriaMetricsClient.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
+using System.Text;
 
+#pragma warning disable IDE0130
 namespace Monq.Core.VictoriaMetricsClient;
 
-public static class DependencyInjectionExtensions
+/// <summary>
+/// <see cref="ServiceCollection"/> extension methods.
+/// </summary>
+public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Adds Victoria Metrics Http Client.
+    /// Add VictoriaMetrics HTTP client.
     /// Use <see cref="IVictoriaClientRead"/> or <see cref="IVictoriaClientWrite"/> 
     /// or <see cref="IVictoriaProxyClient"/> in services.
     /// </summary>
@@ -17,12 +23,14 @@ public static class DependencyInjectionExtensions
     /// <param name="configuration"></param>
     /// <returns></returns>
     [RequiresUnreferencedCode("Configuration binding requires unreferenced code")]
-    public static IServiceCollection AddVictoriaMetricsHttpClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddVictoriaMetricsHttpClient(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.Configure<VictoriaOptions>(configuration);
 
-        var readHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Read);
-        var writeHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Write);
+        var readHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Read, _ => { });
+        var writeHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Write, _ => { });
         services.AddHttpClient<IVictoriaClientRead, VictoriaClientRead>(readHttpClientConfiguration);
         services.AddHttpClient<IVictoriaProxyClient, VictoriaProxyClient>(readHttpClientConfiguration);
         services.AddHttpClient<IVictoriaClientWrite, VictoriaClientWrite>(writeHttpClientConfiguration);
@@ -30,12 +38,45 @@ public static class DependencyInjectionExtensions
         return services;
     }
 
-    static Action<IServiceProvider, HttpClient> BuildConfiguration(ClusterNodeTypes clusterNodeType)
+    /// <summary>
+    /// Add VictoriaMetrics HTTP client.
+    /// Use <see cref="IVictoriaClientRead"/> or <see cref="IVictoriaClientWrite"/> 
+    /// or <see cref="IVictoriaProxyClient"/> in services.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="configuration"></param>
+    /// <param name="configureHttpClient"></param>
+    /// <returns></returns>
+    [RequiresUnreferencedCode("Configuration binding requires unreferenced code")]
+    public static IServiceCollection AddVictoriaMetricsHttpClient(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        Action<HttpClient> configureHttpClient)
     {
-        Action<IServiceProvider, HttpClient> configurationFunc = (provider, client) =>
+        services.Configure<VictoriaOptions>(configuration);
+
+        var readHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Read, configureHttpClient);
+        var writeHttpClientConfiguration = BuildConfiguration(ClusterNodeTypes.Write, configureHttpClient);
+        services.AddHttpClient<IVictoriaClientRead, VictoriaClientRead>(readHttpClientConfiguration);
+        services.AddHttpClient<IVictoriaProxyClient, VictoriaProxyClient>(readHttpClientConfiguration);
+        services.AddHttpClient<IVictoriaClientWrite, VictoriaClientWrite>(writeHttpClientConfiguration);
+
+        return services;
+    }
+
+    static Action<IServiceProvider, HttpClient> BuildConfiguration(
+        ClusterNodeTypes clusterNodeType,
+        Action<HttpClient> configureHttpClient)
+        => (provider, client) =>
         {
             var options = provider.GetRequiredService<IOptions<VictoriaOptions>>();
-            var victoriaOptions = options.Value ?? throw new StorageConfigurationException("There is not configuration found for the VictoriaMetrics.");
+            var victoriaOptions = options.Value ?? throw new StorageConfigurationException("Configuration for VictoriaMetrics is not defined.");
+
+            configureHttpClient(client);
+
+            if (victoriaOptions.HttpTimeout.HasValue)
+                client.Timeout = victoriaOptions.HttpTimeout.Value;
+
             if (victoriaOptions.IsCluster)
                 client.ConfigureVictoriaMetricsAsCluster(victoriaOptions, clusterNodeType);
             else
@@ -53,18 +94,16 @@ public static class DependencyInjectionExtensions
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-protobuf"));
             }
         };
-        return configurationFunc;
-    }
 
     static void ConfigureVictoriaMetricsAsCluster(this HttpClient client, VictoriaOptions options, ClusterNodeTypes clusterNodeType)
     {
         if (string.IsNullOrEmpty(options.ClusterInsertUri))
-            throw new StorageConfigurationException("""You must specify the "clusterInsertUri" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.ClusterInsertUri)} configuration property.");
         if (string.IsNullOrEmpty(options.ClusterSelectUri))
-            throw new StorageConfigurationException("""You must specify the "clusterSelectUri" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.ClusterSelectUri)} configuration property.");
 
         const string multitenant = "multitenant";
-        var accountId = string.Empty;
+        string? accountId;
 
         if (options.ClusterAccountId == multitenant)
             accountId = multitenant;
@@ -87,7 +126,7 @@ public static class DependencyInjectionExtensions
     static void ConfigureVictoriaMetricsAsSingle(this HttpClient client, VictoriaOptions options)
     {
         if (string.IsNullOrEmpty(options.Uri))
-            throw new StorageConfigurationException("""You must specify the "uri" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.Uri)} configuration property.");
 
         client.BaseAddress = new Uri(new Uri(options.Uri), "prometheus/api/v1/");
     }
@@ -95,12 +134,13 @@ public static class DependencyInjectionExtensions
     static void ConfigureVictoriaMetricsWithBasicAuth(this HttpClient client, VictoriaOptions options)
     {
         if (string.IsNullOrEmpty(options.BasicAuthUsername))
-            throw new StorageConfigurationException("""You must specify the "basicAuthUsername" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.BasicAuthUsername)} configuration property.");
         if (string.IsNullOrEmpty(options.BasicAuthPassword))
-            throw new StorageConfigurationException("""You must specify the "basicAuthPassword" configuration property.""");
+            throw new StorageConfigurationException($"You must specify {nameof(VictoriaOptions.BasicAuthPassword)} configuration property.");
 
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(
-                System.Text.Encoding.UTF8.GetBytes($"{options.BasicAuthUsername}:{options.BasicAuthPassword}")));
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Basic",
+            Convert.ToBase64String(Encoding.UTF8.GetBytes($"{options.BasicAuthUsername}:{options.BasicAuthPassword}")));
     }
 
     enum ClusterNodeTypes

@@ -4,13 +4,13 @@ using System.Text.Json.Serialization;
 namespace Monq.Core.VictoriaMetricsClient.SerializerContexts;
 
 /// <summary>
-/// <see cref="Models.BaseQueryDataResponse"/> serializer context.
+/// <see cref="Models.MatrixDataResult"/> serializer context.
 /// </summary>
 [JsonSourceGenerationOptions(
-    UseStringEnumConverter = true,
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     NumberHandling = JsonNumberHandling.AllowReadingFromString)]
-[JsonSerializable(typeof(BaseQueryDataResponse))]
-public sealed partial class BaseQueryDataResponseSerializerContext : JsonSerializerContext
+[JsonSerializable(typeof(MatrixDataResult))]
+[JsonSerializable(typeof(MatrixDataResult[]))]
+public sealed partial class MatrixDataResultSerializerContext : JsonSerializerContext
 {
 }
