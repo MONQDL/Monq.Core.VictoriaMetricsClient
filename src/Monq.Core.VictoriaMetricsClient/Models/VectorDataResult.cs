@@ -13,5 +13,5 @@ public class VectorDataResult
     /// <summary>
     /// Value.
     /// </summary>
-    public float[] Value { get; set; } = [0, 0];
+    public double[] Value { get; set; } = [0, 0];
 }
